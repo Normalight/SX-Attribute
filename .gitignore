@@ -1,5 +1,6 @@
 # Compiled class file
 .gitignore
+.gitattributes
 .xml
 *.class
 .xml
@@ -27,8 +28,6 @@ test/
 *.zip
 *.tar.gz
 *.rar
-*.gitignore
-*.gitattributes
 *.iml
 *.qwq
 
