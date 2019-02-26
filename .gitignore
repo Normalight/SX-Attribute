@@ -11,6 +11,13 @@
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
+.circleci/
+.git/
+.idea/
+disableLibs/
+libs/
+out/
+test/
 
 # Package Files #
 *.jar
@@ -20,6 +27,10 @@
 *.zip
 *.tar.gz
 *.rar
+*.gitignore
+*.gitattributes
+*.iml
+*.qwq
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
