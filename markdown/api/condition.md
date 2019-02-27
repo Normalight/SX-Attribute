@@ -95,7 +95,7 @@ public class TestCondition extends SubCondition {
     @Override
     public SXConditionReturnType determine(LivingEntity entity, ItemStack item, String lore) {
         if (判断lore是否符合条件){
-            if (item != null && entity != null){ /* entity.sendMessage(getItemName(item) + " No Use"); */}
+            if (item != null && entity != null){ itemgenerator}
             return SXConditionReturnType.ITEM;
         }
         return SXConditionReturnType.NULL;

@@ -35,7 +35,7 @@ public class RegisterSlotManager {
                     String name = args[1];
                     int slot = Integer.valueOf(args[0].replaceAll("[^0-9]", ""));
                     String id = args.length > 2 ? args[2] : null;
-                    this.registerSlotList.add(new RegisterSlot(slot, name, id, plugin.getItemUtil()));
+                    this.registerSlotList.add(new RegisterSlot(slot, name, id, plugin.getNbtUtil()));
                 }
             }
             Bukkit.getConsoleSender().sendMessage(Message.getMessagePrefix() + "Load §c" + this.registerSlotList.size() + " §rRegisterSlot");

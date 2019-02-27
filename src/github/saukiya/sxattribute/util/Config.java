@@ -226,7 +226,7 @@ public class Config {
         config.set(NAME_LIMIT_LEVEL, "限制等级");
         config.set(NAME_EXP_ADDITION, "经验加成");
         config.set(NAME_DURABILITY, "耐久度");
-        config.set(CLEAR_ITEM_DURABILITY, true);
+        config.set(CLEAR_ITEM_DURABILITY, false);
         config.set(NAME_SELL, "出售价格");
         config.set(NAME_EXPIRY_TIME, "到期时间");
         config.set(FORMAT_EXPIRY_TIME, "yyyy/MM/dd HH:mm");

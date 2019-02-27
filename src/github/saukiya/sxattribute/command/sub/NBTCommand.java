@@ -3,7 +3,6 @@ package github.saukiya.sxattribute.command.sub;
 import github.saukiya.sxattribute.SXAttribute;
 import github.saukiya.sxattribute.command.SenderType;
 import github.saukiya.sxattribute.command.SubCommand;
-import github.saukiya.sxattribute.util.Message;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
@@ -39,7 +38,7 @@ public class NBTCommand extends SubCommand {
             plugin.getItemDataManager().sendItemMapToPlayer(sender);
             return;
         }
-        String str = plugin.getItemUtil().getAllNBT(item);
+        String str = plugin.getNbtUtil().getAllNBT(item);
         sender.sendMessage("\n\n" + str + "\n");
     }
 

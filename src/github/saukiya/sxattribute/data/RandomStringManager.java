@@ -4,7 +4,6 @@ import github.saukiya.sxattribute.SXAttribute;
 import github.saukiya.sxattribute.util.Message;
 import github.saukiya.sxattribute.util.TimeUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
@@ -39,8 +38,8 @@ public class RandomStringManager {
     /**
      * 处理随机文本
      *
-     * @param string   被随机的文本
-     * @param lockMap  存储固定值的Map
+     * @param string  被随机的文本
+     * @param lockMap 存储固定值的Map
      * @return 处理后的Map
      */
     public String processRandomString(String string, Map<String, String> lockMap) {
@@ -101,8 +100,8 @@ public class RandomStringManager {
     /**
      * 获取字符组
      *
-     * @param name     String
-     * @param lockMap  Map
+     * @param name    String
+     * @param lockMap Map
      * @return String
      */
     private String getRandomString(String name, Map<String, String> lockMap) {
@@ -158,7 +157,7 @@ public class RandomStringManager {
     /**
      * 加载随机字符串数据
      *
-     * @throws IOException                   IOException
+     * @throws IOException IOException
      */
     public void loadData() throws IOException {
         map.clear();

@@ -3,6 +3,7 @@ package github.saukiya.sxattribute.command;
 import github.saukiya.sxattribute.SXAttribute;
 import github.saukiya.sxattribute.util.Message;
 import lombok.Getter;
+import me.skymc.taboolib.json.tellraw.TellrawJson;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -136,7 +137,7 @@ public abstract class SubCommand {
      * @param args   String[]
      * @return List
      */
-    public List<String> onTabComplete(SXAttribute plugin, CommandSender sender, String[] args){
+    public List<String> onTabComplete(SXAttribute plugin, CommandSender sender, String[] args) {
         return null;
     }
 
@@ -152,20 +153,17 @@ public abstract class SubCommand {
     }
 
     /**
-     * 输出介绍 可覆盖
+     * 输出介绍
      *
      * @param sender CommandSender
      * @param color  String
      * @param label  String
      */
     public void sendIntroduction(CommandSender sender, String color, String label) {
-        String introduction = Message.getMsg(Message.valueOf("COMMAND__" + cmd().toUpperCase()));
-        String message = color + MessageFormat.format("/{0} {1}{2}§7 -§c {3}", label, cmd(), arg(), introduction);
-        if (sender instanceof Player) {
-            ((Player) sender).spigot().sendMessage(Message.getTextComponent(message, MessageFormat.format("/{0} {1}", label, cmd()), Arrays.asList(sender.isOp() ? new String[]{"§c" + introduction, "§cPermission: " + permission()} : new String[]{"§c" + introduction})));
-        } else {
-            sender.sendMessage(message);
-        }
+        String clickCommand = MessageFormat.format("/{0} {1}", label, cmd());
+        TellrawJson json = TellrawJson.create().append("§c" + Message.getMsg(Message.valueOf("COMMAND__" + cmd().toUpperCase()))).clickCommand(clickCommand);
+        if (sender.isOp()) json.hoverText("§8§oPermission: " + permission());
+        TellrawJson.create().append(color + MessageFormat.format("/{0} {1}{2}§7 - ", label, cmd(), arg())).clickCommand(clickCommand).append(json).send(sender);
     }
 
     protected Player getPlayer(CommandSender sender, Player player) {

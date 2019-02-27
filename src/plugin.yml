@@ -1,26 +1,26 @@
 name: SX-Attribute
 main: github.saukiya.sxattribute.SXAttribute
-version: 2.333.3
+version: 2.333.4-SNAPSHOT
 author:
-- Saukiya
+  - Saukiya
 
 softdepend:
-- HolographicDisplays
-- PlaceholderAPI
-- RPGInventory
-- MythicMobs
-- SX-Level
-- SkillAPI
-- Vault
+  - HolographicDisplays
+  - PlaceholderAPI
+  - RPGInventory
+  - MythicMobs
+  - SX-Level
+  - SkillAPI
+  - Vault
 
 depend:
-- TabooLib
+  - TabooLib
 
 commands:
   sxattribute:
     usage: error! please reload this plugin
     aliases:
-    - sx
+      - sx
 
 permissions:
   sx-attribute.use:

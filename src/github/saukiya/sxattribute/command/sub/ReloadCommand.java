@@ -2,7 +2,6 @@ package github.saukiya.sxattribute.command.sub;
 
 import github.saukiya.sxattribute.SXAttribute;
 import github.saukiya.sxattribute.command.SubCommand;
-import github.saukiya.sxattribute.data.attribute.SXAttributeManager;
 import github.saukiya.sxattribute.event.SXReloadEvent;
 import github.saukiya.sxattribute.util.Config;
 import github.saukiya.sxattribute.util.Message;

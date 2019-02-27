@@ -95,9 +95,10 @@ public enum Message {
     INVENTORY__DISPLAY_SLOTS_NAME,
     ADMIN__CLEAR_ENTITY_DATA,
     ADMIN__NO_ITEM,
-    ADMIN__HAS_ITEM,
     ADMIN__GIVE_ITEM,
+    ADMIN__HAS_ITEM,
     ADMIN__SAVE_ITEM,
+    ADMIN__SAVE_NO_TYPE,
     ADMIN__SAVE_ITEM_ERROR,
     ADMIN__NO_PERMISSION_CMD,
     ADMIN__NO_CMD,
@@ -239,10 +240,11 @@ public enum Message {
 
         messages.set(ADMIN__CLEAR_ENTITY_DATA.toString(), getMessagePrefix() + "&c清理了 &6{0}&c 个多余的生物属性数据!");
         messages.set(ADMIN__NO_ITEM.toString(), getMessagePrefix() + "&c物品不存在!");
-        messages.set(ADMIN__HAS_ITEM.toString(), getMessagePrefix() + "&c已经存在名字为  &6{0}&c的物品!");
         messages.set(ADMIN__GIVE_ITEM.toString(), getMessagePrefix() + "&c给予 &6{0} &a{1}&c个 &6{2}&c 物品!");
-        messages.set(ADMIN__SAVE_ITEM.toString(), getMessagePrefix() + "&a物品 &6{0} &a成功保存! 编号为: &6{1}&a!");
-        messages.set(ADMIN__SAVE_ITEM_ERROR.toString(), getMessagePrefix() + "&c物品 &4{0} &c保存出现不可预知的错误 [&4{1}&c]");
+        messages.set(ADMIN__HAS_ITEM.toString(), getMessagePrefix() + "&c已经存在名字为&6 {0}&c 的物品!");
+        messages.set(ADMIN__SAVE_ITEM.toString(), getMessagePrefix() + "&a物品编号 &6{0} &a成功保存");
+        messages.set(ADMIN__SAVE_NO_TYPE.toString(), getMessagePrefix() + "&c物品编号 &4{0} &c保存失败, 请检查该生成器是否存在, 并支持保存物品");
+        messages.set(ADMIN__SAVE_ITEM_ERROR.toString(), getMessagePrefix() + "&c物品 &4{0} &c保存出现不可预知的错误");
         messages.set(ADMIN__NO_PERMISSION_CMD.toString(), getMessagePrefix() + "&c你没有权限执行此指令");
         messages.set(ADMIN__NO_CMD.toString(), getMessagePrefix() + "&c未找到此子指令:{0}");
         messages.set(ADMIN__NO_FORMAT.toString(), getMessagePrefix() + "&c格式错误!");
@@ -254,7 +256,7 @@ public enum Message {
         messages.set(COMMAND__SELL.toString(), "打开出售界面");
         messages.set(COMMAND__REPAIR.toString(), "打开修理界面");
         messages.set(COMMAND__GIVE.toString(), "给予玩家RPG物品");
-        messages.set(COMMAND__SAVE.toString(), "保存当前的物品到配置文件 加[-a]完全保存");
+        messages.set(COMMAND__SAVE.toString(), "保存当前的物品到配置文件 [Type] - 生成器类型");
         messages.set(COMMAND__NBT.toString(), "查看当前手持物品的NBT数据");
         messages.set(COMMAND__DISPLAYSLOT.toString(), "显示可装载物品的槽位");
         messages.set(COMMAND__ATTRIBUTELIST.toString(), "查看当前属性列表");
@@ -396,7 +398,7 @@ public enum Message {
             send((Player) entity, Message.getMsg(loc, args));
         }
     }
-    
+
     /**
      * 发送消息给玩家
      *

@@ -1,7 +1,6 @@
 package github.saukiya.sxattribute.command.sub;
 
 import github.saukiya.sxattribute.SXAttribute;
-import github.saukiya.sxattribute.api.SXAPI;
 import github.saukiya.sxattribute.command.SenderType;
 import github.saukiya.sxattribute.command.SubCommand;
 import github.saukiya.sxattribute.data.attribute.SXAttributeData;

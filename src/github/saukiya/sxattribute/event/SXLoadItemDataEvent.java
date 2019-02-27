@@ -13,8 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Map;
 
 /**
- * 这个类用来加载玩家防具物品的数据事件
- * 可以对里面的Items、AttributeData进行修改操作
+ * 加载实体物品数据事件
  *
  * @author Saukiya
  */
@@ -50,7 +49,6 @@ public class SXLoadItemDataEvent extends Event {
         }
         return sxAttributeData;
     }
-
 
     public static class Data {
 

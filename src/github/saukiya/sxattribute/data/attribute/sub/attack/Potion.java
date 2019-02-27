@@ -15,7 +15,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -38,43 +41,43 @@ public class Potion extends SubAttribute {
 
     @Override
     protected YamlConfiguration defaultYaml(YamlConfiguration yaml) {
-        yaml.set("NetworkLink","https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/potion/PotionEffectType.html");
-        yaml.set("List.BLINDNESS.MessageName","&7致盲&7");
-        yaml.set("List.BLINDNESS.DiscernName","致盲几率");
-        yaml.set("List.BLINDNESS.CombatPower",1);
-        yaml.set("List.BLINDNESS.MinLevel",1);
-        yaml.set("List.BLINDNESS.MaxLevel",2);
-        yaml.set("List.BLINDNESS.MinTime",2);
-        yaml.set("List.BLINDNESS.MaxTime",5);
-        yaml.set("List.WITHER.MessageName","&9诅咒&7");
-        yaml.set("List.WITHER.DiscernName","诅咒几率");
-        yaml.set("List.WITHER.CombatPower",1);
-        yaml.set("List.WITHER.MinLevel",1);
-        yaml.set("List.WITHER.MaxLevel",2);
-        yaml.set("List.WITHER.MinTime",2);
-        yaml.set("List.WITHER.MaxTime",5);
-        yaml.set("List.SLOW.MessageName","&3减速&7");
-        yaml.set("List.SLOW.DiscernName","减速几率");
-        yaml.set("List.SLOW.CombatPower",1);
-        yaml.set("List.SLOW.MinLevel",1);
-        yaml.set("List.SLOW.MaxLevel",2);
-        yaml.set("List.SLOW.MinTime",2);
-        yaml.set("List.SLOW.MaxTime",5);
-        yaml.set("List.POISON.MessageName","&d中毒&7");
-        yaml.set("List.POISON.DiscernName","中毒几率");
-        yaml.set("List.POISON.CombatPower",1);
-        yaml.set("List.POISON.MinLevel",1);
-        yaml.set("List.POISON.MaxLevel",2);
-        yaml.set("List.POISON.MinTime",2);
-        yaml.set("List.POISON.MaxTime",5);
-        yaml.set("List.HUNGER.MessageName","&c饥饿&7");
-        yaml.set("List.HUNGER.DiscernName","夺食几率");
-        yaml.set("List.HUNGER.CombatPower",1);
-        yaml.set("List.HUNGER.MinLevel",4);
-        yaml.set("List.HUNGER.MaxLevel",5);
-        yaml.set("List.HUNGER.MinTime",2);
-        yaml.set("List.HUNGER.MaxTime",5);
-        yaml.set("List.HUNGER.UpperLimit",50);
+        yaml.set("NetworkLink", "https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/potion/PotionEffectType.html");
+        yaml.set("List.BLINDNESS.MessageName", "&7致盲&7");
+        yaml.set("List.BLINDNESS.DiscernName", "致盲几率");
+        yaml.set("List.BLINDNESS.CombatPower", 1);
+        yaml.set("List.BLINDNESS.MinLevel", 1);
+        yaml.set("List.BLINDNESS.MaxLevel", 2);
+        yaml.set("List.BLINDNESS.MinTime", 2);
+        yaml.set("List.BLINDNESS.MaxTime", 5);
+        yaml.set("List.WITHER.MessageName", "&9诅咒&7");
+        yaml.set("List.WITHER.DiscernName", "诅咒几率");
+        yaml.set("List.WITHER.CombatPower", 1);
+        yaml.set("List.WITHER.MinLevel", 1);
+        yaml.set("List.WITHER.MaxLevel", 2);
+        yaml.set("List.WITHER.MinTime", 2);
+        yaml.set("List.WITHER.MaxTime", 5);
+        yaml.set("List.SLOW.MessageName", "&3减速&7");
+        yaml.set("List.SLOW.DiscernName", "减速几率");
+        yaml.set("List.SLOW.CombatPower", 1);
+        yaml.set("List.SLOW.MinLevel", 1);
+        yaml.set("List.SLOW.MaxLevel", 2);
+        yaml.set("List.SLOW.MinTime", 2);
+        yaml.set("List.SLOW.MaxTime", 5);
+        yaml.set("List.POISON.MessageName", "&d中毒&7");
+        yaml.set("List.POISON.DiscernName", "中毒几率");
+        yaml.set("List.POISON.CombatPower", 1);
+        yaml.set("List.POISON.MinLevel", 1);
+        yaml.set("List.POISON.MaxLevel", 2);
+        yaml.set("List.POISON.MinTime", 2);
+        yaml.set("List.POISON.MaxTime", 5);
+        yaml.set("List.HUNGER.MessageName", "&c饥饿&7");
+        yaml.set("List.HUNGER.DiscernName", "夺食几率");
+        yaml.set("List.HUNGER.CombatPower", 1);
+        yaml.set("List.HUNGER.MinLevel", 4);
+        yaml.set("List.HUNGER.MaxLevel", 5);
+        yaml.set("List.HUNGER.MinTime", 2);
+        yaml.set("List.HUNGER.MaxTime", 5);
+        yaml.set("List.HUNGER.UpperLimit", 50);
         return yaml;
     }
 
@@ -180,8 +183,8 @@ public class Potion extends SubAttribute {
         }
 
         public void load(ConfigurationSection config) {
-            this.messageName = config.getString("MessageName").replace("&","§");
-            this.discernName = config.getString("DiscernName").replace("&","§");
+            this.messageName = config.getString("MessageName").replace("&", "§");
+            this.discernName = config.getString("DiscernName").replace("&", "§");
             this.combatPower = config.getInt("CombatPower", 1);
             this.minLevel = config.getInt("MinLevel", 1);
             this.maxLevel = config.getInt("MaxLevel", 2);

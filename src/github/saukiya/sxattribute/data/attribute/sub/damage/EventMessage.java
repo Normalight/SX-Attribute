@@ -80,7 +80,7 @@ public class EventMessage extends SubAttribute/** implements Listener **/
 //    @EventHandler
 //    void onItemMergeEvent(ItemMergeEvent event) {
 //        if (event.isCancelled()) return;
-//        if (event.getTarget().hasMetadata(SXAttribute.getPluginName() + getName()) || event.getDefender().hasMetadata(SXAttribute.getPluginName() + getName())) {
+//        if (event.getTarget().hasMetadata(SXAttribute.getPluginName() + getKey()) || event.getDefender().hasMetadata(SXAttribute.getPluginName() + getKey())) {
 //            event.setCancelled(true);
 //        }
 //    }
@@ -124,7 +124,7 @@ public class EventMessage extends SubAttribute/** implements Listener **/
 //        armorStand.setBasePlate(false); //消失底盘
 //        armorStand.setMarker(false); //碰撞箱子
 //        armorStand.setRemoveWhenFarAway(true); //远离消失
-//        armorStand.setMetadata(SXAttribute.getPluginName() + getName(), new MessageMetaData(armorStand));
+//        armorStand.setMetadata(SXAttribute.getPluginName() + getKey(), new MessageMetaData(armorStand));
 ////        armorStand.setVelocity(loc.getDirection().multiply(0.5D));
 //        armorStand.setVelocity(new Vector(0,0.5,0));
 //        armorStand.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(1D);

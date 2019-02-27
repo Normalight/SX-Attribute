@@ -26,7 +26,11 @@ public class GiveCommand extends SubCommand {
     @Override
     public void onCommand(SXAttribute plugin, CommandSender sender, String[] args) {
         if (args.length < 2) {
-            plugin.getItemDataManager().sendItemMapToPlayer(sender);
+            if (sender instanceof Player) {
+                plugin.getItemDataManager().sendItemMapToPlayer(sender, "");
+            } else {
+                plugin.getItemDataManager().sendItemMapToPlayer(sender);
+            }
             return;
         }
         Player player = null;
@@ -62,7 +66,6 @@ public class GiveCommand extends SubCommand {
     @Override
     public List<String> onTabComplete(SXAttribute plugin, CommandSender sender, String[] args) {
         if (args.length == 2) {
-            if (args[1].length() == 0) plugin.getItemDataManager().sendItemMapToPlayer(sender);
             return plugin.getItemDataManager().getItemList().stream().filter(itemName -> itemName.contains(args[1])).collect(Collectors.toList());
         }
         if (args.length == 4) {

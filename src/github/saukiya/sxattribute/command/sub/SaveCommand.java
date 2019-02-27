@@ -5,7 +5,6 @@ import github.saukiya.sxattribute.command.SenderType;
 import github.saukiya.sxattribute.command.SubCommand;
 import github.saukiya.sxattribute.util.Message;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -19,7 +18,7 @@ import java.util.List;
  */
 public class SaveCommand extends SubCommand {
     public SaveCommand() {
-        super("save", " <ItemName> ", SenderType.PLAYER);
+        super("save", " <ItemName> [Type]", SenderType.PLAYER);
     }
 
     @Override
@@ -36,20 +35,19 @@ public class SaveCommand extends SubCommand {
             player.sendMessage(Message.getMsg(Message.ADMIN__NO_ITEM));
             return;
         }
-        if (plugin.getItemDataManager().isItem(itemName)) {
+        if (plugin.getItemDataManager().hasItem(itemName)) {
             player.sendMessage(Message.getMsg(Message.ADMIN__HAS_ITEM, itemName));
             return;
         }
         try {
-            if (args.length > 2 && args[2].equalsIgnoreCase("-a")) {
-                plugin.getItemDataManager().importItem(itemName, itemStack);
+            if (plugin.getItemDataManager().saveItem(itemName, itemStack, args.length > 2 ? args[2] : "SX")) {
+                sender.sendMessage(Message.getMsg(Message.ADMIN__SAVE_ITEM, itemName));
             } else {
-                plugin.getItemDataManager().saveItem(itemName, itemStack);
+                sender.sendMessage(Message.getMsg(Message.ADMIN__SAVE_NO_TYPE, itemName));
             }
-            sender.sendMessage(Message.getMsg(Message.ADMIN__SAVE_ITEM, itemStack.getItemMeta().hasDisplayName() ? itemStack.getItemMeta().getDisplayName() : itemStack.getType().name(), args[1]));
         } catch (IOException e) {
             e.printStackTrace();
-            sender.sendMessage(Message.getMsg(Message.ADMIN__SAVE_ITEM_ERROR, itemStack.getItemMeta().hasDisplayName() ? itemStack.getItemMeta().getDisplayName() : itemStack.getType().name(), args[1]));
+            sender.sendMessage(Message.getMsg(Message.ADMIN__SAVE_ITEM_ERROR, itemName));
         }
     }
 

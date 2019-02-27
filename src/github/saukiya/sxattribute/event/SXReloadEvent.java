@@ -6,8 +6,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 /**
- * 这个类用来加载玩家防具物品的数据事件
- * 可以对里面的Items、AttributeData进行修改操作
+ * 插件重载事件
  *
  * @author Saukiya
  */

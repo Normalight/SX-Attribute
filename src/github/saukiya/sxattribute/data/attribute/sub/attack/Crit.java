@@ -1,6 +1,5 @@
 package github.saukiya.sxattribute.data.attribute.sub.attack;
 
-import com.ilummc.tlib.resources.TLocale;
 import github.saukiya.sxattribute.data.attribute.SXAttributeType;
 import github.saukiya.sxattribute.data.attribute.SubAttribute;
 import github.saukiya.sxattribute.data.eventdata.EventData;

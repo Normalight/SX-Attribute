@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -83,7 +84,6 @@ public abstract class SubAttribute {
     /**
      * 属性正常启动后
      * 加载配置文件
-     *
      */
     public final void loadYaml() {
         if (file == null) {
@@ -237,7 +237,6 @@ public abstract class SubAttribute {
 
     /**
      * 纠正属性值
-     *
      */
     public void correct(double[] values) {
         int bound = values.length;
@@ -272,5 +271,9 @@ public abstract class SubAttribute {
     public static double getNumber(String lore) {
         String str = lore.replaceAll("\u00a7+[a-z0-9]", "").replaceAll("[^-0-9.]", "");
         return str.length() == 0 || str.replaceAll("[^.]", "").length() > 1 ? 0D : Double.valueOf(str);
+    }
+
+    public final void send(LivingEntity entity, String loc, Object... args) {
+
     }
 }

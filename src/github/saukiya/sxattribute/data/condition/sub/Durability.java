@@ -1,11 +1,14 @@
 package github.saukiya.sxattribute.data.condition.sub;
 
 import github.saukiya.sxattribute.SXAttribute;
-import github.saukiya.sxattribute.data.ItemDataManager;
+import github.saukiya.sxattribute.data.itemdata.ItemDataManager;
 import github.saukiya.sxattribute.data.condition.SXConditionReturnType;
 import github.saukiya.sxattribute.data.condition.SubCondition;
+import github.saukiya.sxattribute.event.SXItemSpawnEvent;
+import github.saukiya.sxattribute.event.SXItemUpdateEvent;
 import github.saukiya.sxattribute.util.Config;
 import github.saukiya.sxattribute.util.Message;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -30,12 +33,16 @@ import java.util.List;
  */
 public class Durability extends SubCondition implements Listener {
 
+    @Getter
+    public static boolean enabled = false;
+
     public Durability(SXAttribute plugin) {
         super(plugin);
     }
 
     @Override
     public void onEnable() {
+        enabled = true;
         Bukkit.getPluginManager().registerEvents(this, getPlugin());
     }
 
@@ -120,10 +127,44 @@ public class Durability extends SubCondition implements Listener {
         return false;
     }
 
-    @EventHandler (priority = EventPriority.LOW)
+    @EventHandler(priority = EventPriority.LOW)
     void onItemDurabilityEvent(PlayerItemDamageEvent event) {
-        if (!event.isCancelled() && editDurability(event.getPlayer(), event.getItem(), event.getDamage())) {
-            event.setCancelled(true);
+        if (event.isCancelled()) return;
+        event.setCancelled(editDurability(event.getPlayer(), event.getItem(), event.getDamage()));
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    void onSXItemSpawnEvent(SXItemSpawnEvent event) {
+        if (event.isCancelled() || event instanceof SXItemUpdateEvent) return;
+        editDurability(event.getPlayer(), event.getItem(), 0);
+    }
+
+    @EventHandler
+    void onSXItemUpdateEvent(SXItemUpdateEvent event) {
+        if (event.isCancelled()) return;
+        ItemMeta itemMeta = event.getItem().getItemMeta();
+        ItemMeta oldItemMeta = event.getOldItem().getItemMeta();
+        if (itemMeta.hasLore() && oldItemMeta.hasLore()) {
+        List<String> itemList = itemMeta.getLore();
+        List<String> oldItemList = oldItemMeta.getLore();
+        String detect = Config.getConfig().getString(Config.NAME_DURABILITY);
+            for (int i = itemList.size() - 1; i >= 0; i--) {
+                if (itemList.get(i).contains(detect)) {
+                    for (int i1 = oldItemList.size() - 1; i1 >= 0; i1--) {
+                        String oldLore = oldItemList.get(i1);
+                        if (oldLore.contains(detect)) {
+                            double oldMaxDurability = SubCondition.getMaxDurability(oldLore);
+                            double oldDurability = SubCondition.getDurability(oldLore);
+                            String lore = itemList.get(i);
+                            double maxDurability = SubCondition.getMaxDurability(lore);
+                            itemList.set(i, ItemDataManager.replaceColor(ItemDataManager.clearColor(lore).replaceFirst(String.valueOf(SubCondition.getDurability(lore)), String.valueOf((int) (oldDurability / oldMaxDurability * maxDurability)))));
+                            itemMeta.setLore(itemList);
+                            event.getItem().setItemMeta(itemMeta);
+                            return;
+                        }
+                    }
+                }
+            }
         }
     }
 

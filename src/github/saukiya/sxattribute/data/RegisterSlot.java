@@ -2,7 +2,7 @@ package github.saukiya.sxattribute.data;
 
 import github.saukiya.sxattribute.SXAttribute;
 import github.saukiya.sxattribute.util.Config;
-import github.saukiya.sxattribute.util.ItemUtil;
+import github.saukiya.sxattribute.util.NbtUtil;
 import lombok.Getter;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -22,7 +22,7 @@ public class RegisterSlot {
 
     // TODO id 转为物品库 去除ItemUtil
     @SuppressWarnings("deprecation")
-    public RegisterSlot(int slot, String name, String id, ItemUtil itemUtil) {
+    public RegisterSlot(int slot, String name, String id, NbtUtil nbtUtil) {
         this.slot = slot;
         this.name = name.replace("&", "§");
         int itemMaterial = 160, itemDurability = id == null ? 15 : 0;
@@ -35,7 +35,7 @@ public class RegisterSlot {
                 itemMaterial = Integer.valueOf(id);
             }
         }
-        this.item = itemUtil.setNBT(new ItemStack(itemMaterial, 1, (short) itemDurability), "Slot", this.name);
+        this.item = nbtUtil.setNBT(new ItemStack(itemMaterial, 1, (short) itemDurability), SXAttribute.getPluginName() + "-Slot", this.name);
         ItemMeta meta = item.getItemMeta();
         meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
         if (SXAttribute.getVersionSplit()[1] >= 11) {

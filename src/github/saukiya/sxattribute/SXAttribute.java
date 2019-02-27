@@ -3,7 +3,7 @@ package github.saukiya.sxattribute;
 import github.saukiya.sxattribute.api.API;
 import github.saukiya.sxattribute.bstats.Metrics;
 import github.saukiya.sxattribute.command.MainCommand;
-import github.saukiya.sxattribute.data.ItemDataManager;
+import github.saukiya.sxattribute.data.itemdata.ItemDataManager;
 import github.saukiya.sxattribute.data.RandomStringManager;
 import github.saukiya.sxattribute.data.RegisterSlotManager;
 import github.saukiya.sxattribute.data.attribute.SXAttributeManager;
@@ -16,6 +16,8 @@ import github.saukiya.sxattribute.data.attribute.sub.update.AttackSpeed;
 import github.saukiya.sxattribute.data.attribute.sub.update.WalkSpeed;
 import github.saukiya.sxattribute.data.condition.SXConditionManager;
 import github.saukiya.sxattribute.data.condition.sub.*;
+import github.saukiya.sxattribute.data.itemdata.sub.ImportItemData;
+import github.saukiya.sxattribute.data.itemdata.sub.SXItemData;
 import github.saukiya.sxattribute.listener.*;
 import github.saukiya.sxattribute.util.*;
 import lombok.Getter;
@@ -28,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 /**
  * SX-Attribute
@@ -80,7 +83,7 @@ public class SXAttribute extends JavaPlugin {
 
 
     @Getter
-    private ItemUtil itemUtil;
+    private NbtUtil nbtUtil;
 
     @Getter
     private MainCommand mainCommand;
@@ -125,6 +128,8 @@ public class SXAttribute extends JavaPlugin {
         }
         mainCommand = new MainCommand(this);
 
+
+
         new Crit(this);
         new Damage(this);
         new HitRate(this);
@@ -160,6 +165,9 @@ public class SXAttribute extends JavaPlugin {
         new Role(this);
         new ExpiryTime(this);
         new Durability(this);
+
+        ItemDataManager.registerGenerator(new ImportItemData(this));
+        ItemDataManager.registerGenerator(new SXItemData(this));
     }
 
     @Override
@@ -217,17 +225,14 @@ public class SXAttribute extends JavaPlugin {
         String version = Bukkit.getBukkitVersion().split("-")[0].replace(" ", "");
         Bukkit.getConsoleSender().sendMessage(Message.getMessagePrefix() + "ServerVersion: " + version);
         String[] strSplit = version.split("[.]");
-        int bound = strSplit.length;
-        for (int i = 0; i < bound; i++) {
-            versionSplit[i] = Integer.valueOf(strSplit[i]);
-        }
+        IntStream.range(0, strSplit.length).forEach(i -> versionSplit[i] = Integer.valueOf(strSplit[i]));
         pluginEnabled = true;
         attributeManager = new SXAttributeManager(this);
 
         conditionManager = new SXConditionManager();
         new Metrics(this);
         try {
-            itemUtil = new ItemUtil(this);
+            nbtUtil = new NbtUtil();
             randomStringManager = new RandomStringManager(this);
             itemDataManager = new ItemDataManager(this);
         } catch (IOException e) {

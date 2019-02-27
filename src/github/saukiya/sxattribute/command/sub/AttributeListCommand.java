@@ -14,7 +14,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,24 +39,24 @@ public class AttributeListCommand extends SubCommand {
             SubAttribute attribute = SXAttributeManager.getSubAttributes()[i];
             String message = "§b" + attribute.getPriority() + " §7- §c" + attribute.getName() + " §8[§7Plugin: §c" + attribute.getPlugin().getName() + "§7,Length: §c" + attribute.getLength() + "§8]";
             if (message.contains(search)) {
-                    List<String> list = new ArrayList<>();
-                    list.add("&bName: " + attribute.getName());
-                    list.add("&bAttributeType: ");
-                    for (SXAttributeType type : attribute.getType()) {
-                        list.add("&7- " + type.getType() + " &8(&7" + type.getName() + "&8)");
+                List<String> list = new ArrayList<>();
+                list.add("&bName: " + attribute.getName());
+                list.add("&bAttributeType: ");
+                for (SXAttributeType type : attribute.getType()) {
+                    list.add("&7- " + type.getType() + " &8(&7" + type.getName() + "&8)");
+                }
+                list.add("&bPlaceholders: ");
+                if (attribute.getPlaceholders() != null) {
+                    for (String placeName : attribute.getPlaceholders()) {
+                        list.add("&7- %sx_" + placeName + "% : " + attribute.getPlaceholder(attributeData.getValues(attribute), (Player) sender, placeName));
                     }
-                    list.add("&bPlaceholders: ");
-                    if (attribute.getPlaceholders() != null) {
-                        for (String placeName : attribute.getPlaceholders()) {
-                            list.add("&7- %sx_" + placeName + "% : " + attribute.getPlaceholder(attributeData.getValues(attribute), (Player) sender, placeName));
-                        }
-                    }
-                    list.add("&bValue: " + attribute.calculationCombatPower(attributeData.getValues(attribute)));
-                    TextComponent tc = Message.getTextComponent(message, null, list);
-                    if (attribute.getYaml() != null) {
-                        tc.addExtra(" ");
-                        tc.addExtra(Message.getTextComponent("§8[§cYaml§8]", null, Collections.singletonList(attribute.getYaml().saveToString())));
-                    }
+                }
+                list.add("&bValue: " + attribute.calculationCombatPower(attributeData.getValues(attribute)));
+                TextComponent tc = Message.getTextComponent(message, null, list);
+                if (attribute.getYaml() != null) {
+                    tc.addExtra(" ");
+                    tc.addExtra(Message.getTextComponent("§8[§cYaml§8]", null, Collections.singletonList(attribute.getYaml().saveToString())));
+                }
                 if (sender instanceof Player) {
                     ((Player) sender).spigot().sendMessage(tc);
                 } else {

@@ -1,7 +1,5 @@
 package github.saukiya.sxattribute.listener;
 
-import com.google.common.base.Functions;
-import com.google.common.collect.ImmutableMap;
 import github.saukiya.sxattribute.SXAttribute;
 import github.saukiya.sxattribute.data.attribute.SXAttributeData;
 import github.saukiya.sxattribute.data.attribute.SXAttributeManager;
@@ -20,14 +18,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.EnumMap;
 
 /**
  * @author Saukiya
@@ -46,9 +41,9 @@ public class OnDamageListener implements Listener {
         if (event.isCancelled()) return;
         Entity projectile = event.getProjectile();
         LivingEntity entity = event.getEntity();
-        if (entity instanceof Player) {
-            //TODO 力量?? event.getForce()
-            plugin.getApi().setProjectileData(projectile.getUniqueId(), plugin.getAttributeManager().getEntityData(entity));
+        if (entity instanceof LivingEntity) {
+            System.out.println(event.getForce());
+            SXAttribute.getApi().setProjectileData(projectile.getUniqueId(), plugin.getAttributeManager().getEntityData(entity));
             ItemStack item = event.getBow();
             if (item != null && SubCondition.getUnbreakable(item.getItemMeta())) {
                 Bukkit.getPluginManager().callEvent(new PlayerItemDamageEvent((Player) entity, item, 1));

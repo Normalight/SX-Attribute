@@ -6,7 +6,7 @@ import github.saukiya.sxattribute.data.RegisterSlot;
 import github.saukiya.sxattribute.data.attribute.SXAttributeData;
 import github.saukiya.sxattribute.data.condition.SXConditionType;
 import github.saukiya.sxattribute.data.condition.SubCondition;
-import github.saukiya.sxattribute.util.ItemUtil;
+import github.saukiya.sxattribute.util.NbtUtil;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -41,8 +41,8 @@ public class API {
      *
      * @return ItemUtils
      */
-    public ItemUtil getItemUtil() {
-        return plugin.getItemUtil();
+    public NbtUtil getNbtUtil() {
+        return plugin.getNbtUtil();
     }
 
     /**
@@ -260,6 +260,16 @@ public class API {
      */
     public ItemStack getItem(String itemKey, Player player) {
         return plugin.getItemDataManager().getItem(itemKey, player);
+    }
+
+    /**
+     * 返回是否存在物品
+     *
+     * @param itemKey String
+     * @return ItemStack
+     */
+    public boolean hasItem(String itemKey) {
+        return plugin.getItemDataManager().hasItem(itemKey);
     }
 
     /**

@@ -3,7 +3,7 @@ package github.saukiya.sxattribute.command.sub;
 import github.saukiya.sxattribute.SXAttribute;
 import github.saukiya.sxattribute.command.SenderType;
 import github.saukiya.sxattribute.command.SubCommand;
-import github.saukiya.sxattribute.data.ItemDataManager;
+import github.saukiya.sxattribute.data.itemdata.ItemDataManager;
 import github.saukiya.sxattribute.util.Message;
 import github.saukiya.sxattribute.util.MoneyUtil;
 import org.bukkit.Bukkit;

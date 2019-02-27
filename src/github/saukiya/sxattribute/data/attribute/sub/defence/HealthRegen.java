@@ -1,7 +1,6 @@
 package github.saukiya.sxattribute.data.attribute.sub.defence;
 
 import github.saukiya.sxattribute.SXAttribute;
-import github.saukiya.sxattribute.api.SXAPI;
 import github.saukiya.sxattribute.data.attribute.SXAttributeType;
 import github.saukiya.sxattribute.data.attribute.SubAttribute;
 import github.saukiya.sxattribute.data.eventdata.EventData;

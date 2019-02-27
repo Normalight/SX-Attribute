@@ -7,6 +7,7 @@ import github.saukiya.sxattribute.data.condition.SXConditionReturnType;
 import github.saukiya.sxattribute.data.condition.SXConditionType;
 import github.saukiya.sxattribute.data.condition.SubCondition;
 import github.saukiya.sxattribute.data.eventdata.sub.UpdateEventData;
+import github.saukiya.sxattribute.event.SXGetDataEvent;
 import github.saukiya.sxattribute.event.SXLoadItemDataEvent;
 import github.saukiya.sxattribute.util.Config;
 import github.saukiya.sxattribute.util.Message;
@@ -35,6 +36,7 @@ public class SXAttributeManager implements Listener {
 
     @Getter
     private static final SubAttribute[] subAttributes = SubAttribute.registerAttributeMap.values().toArray(new SubAttribute[0]);
+
     static {
         SubAttribute.registerAttributeMap = null;
         SubAttribute.priorityList = null;
@@ -64,7 +66,7 @@ public class SXAttributeManager implements Listener {
                 subAttribute.onEnable();
             }
         }
-        if (Arrays.stream(subAttributes).allMatch(subAttribute -> subAttribute.getPlugin().isEnabled())){
+        if (Arrays.stream(subAttributes).allMatch(subAttribute -> subAttribute.getPlugin().isEnabled())) {
             loadDefaultAttributeData();
         }
     }
@@ -237,11 +239,11 @@ public class SXAttributeManager implements Listener {
         SXAttributeData data = new SXAttributeData();
         data.add(getEntityDataMap().get(entity.getUniqueId()));
         data.add(SXAttribute.getApi().getAPIAttribute(entity.getUniqueId()));
-        // 计算点数
         data.calculationCombatPower();
-        // 生物默认数据
         data.add(defaultAttributeData);
-        // 纠正数值
+        // TODO s
+        SXGetDataEvent event = new SXGetDataEvent(entity,data);
+        Bukkit.getPluginManager().callEvent(event);
         data.correct();
         return data;
     }

@@ -1,7 +1,6 @@
 package github.saukiya.sxattribute.data.attribute.sub.other;
 
 import github.saukiya.sxattribute.SXAttribute;
-import github.saukiya.sxattribute.api.SXAPI;
 import github.saukiya.sxattribute.data.attribute.SXAttributeType;
 import github.saukiya.sxattribute.data.attribute.SubAttribute;
 import github.saukiya.sxattribute.data.eventdata.EventData;
@@ -66,7 +65,7 @@ public class MythicMobsDrop extends SubAttribute implements Listener {
                     ItemStack item = SXAttribute.getApi().getItem(args[0], (Player) event.getKiller());
                     if (item != null) {
 //                        if (str.contains("seal") && sxSeal) {
-//                            SXSeal.getApi().sealItem(item);
+//                            SXSeal.getApi().sealItem(itemdata);
 //                        }
                         item.setAmount(amount);
                         drops.add(item.clone());

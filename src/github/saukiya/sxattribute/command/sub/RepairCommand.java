@@ -3,8 +3,7 @@ package github.saukiya.sxattribute.command.sub;
 import github.saukiya.sxattribute.SXAttribute;
 import github.saukiya.sxattribute.command.SenderType;
 import github.saukiya.sxattribute.command.SubCommand;
-import github.saukiya.sxattribute.data.ItemDataManager;
-import github.saukiya.sxattribute.data.attribute.SXAttributeManager;
+import github.saukiya.sxattribute.data.itemdata.ItemDataManager;
 import github.saukiya.sxattribute.data.condition.SXConditionManager;
 import github.saukiya.sxattribute.data.condition.SubCondition;
 import github.saukiya.sxattribute.data.condition.sub.Durability;
@@ -107,12 +106,12 @@ public class RepairCommand extends SubCommand implements Listener {
 
     @Override
     public boolean isUse(CommandSender sender, SenderType type) {
-        return super.isUse(sender, type) && SXAttribute.isVault() && Arrays.stream(SXConditionManager.getSubConditions()).anyMatch(sub -> sub instanceof Durability);
+        return super.isUse(sender, type) && SXAttribute.isVault() && Arrays.stream(SXConditionManager.getSubConditions()).anyMatch(sub -> sub.getClass().equals(Durability.class));
     }
 
     @Override
     public boolean hide() {
-        return !SXAttribute.isVault() || Arrays.stream(SXConditionManager.getSubConditions()).noneMatch(sub -> sub instanceof Durability);
+        return !SXAttribute.isVault() || Arrays.stream(SXConditionManager.getSubConditions()).noneMatch(sub -> sub.getClass().equals(Durability.class));
     }
 
     @Override

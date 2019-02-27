@@ -3,6 +3,7 @@ package github.saukiya.sxattribute.command;
 import github.saukiya.sxattribute.SXAttribute;
 import github.saukiya.sxattribute.command.sub.*;
 import github.saukiya.sxattribute.util.Message;
+import me.skymc.taboolib.json.tellraw.TellrawJson;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -70,7 +71,10 @@ public class MainCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command arg1, String label, String[] args) {
         SenderType type = getType(sender);
         if (args.length == 0) {
-            sender.sendMessage("§0-§8 --§7 ---§c ----§4 -----§b " + SXAttribute.getPluginName() + "§4 -----§c ----§7 ---§8 --§0 - §0Author Saukiya");
+            String message = "§0-§8 --§7 ---§c ----§4 -----§b " + SXAttribute.getPluginName() + "§4 -----§c ----§7 ---§8 --§0 - §0Author Saukiya";
+            TellrawJson json = TellrawJson.create().append(message);
+            if (sender.isOp()) json.hoverText("§8§oUse Permission: SX-Attribute.use");
+            json.send(sender);
             String color = "§7";
             for (SubCommand sub : subCommands.toCollection()) {
                 if (sub.isUse(sender, type) && !sub.hide()) {
