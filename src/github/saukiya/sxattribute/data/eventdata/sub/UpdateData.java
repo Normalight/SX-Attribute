@@ -8,11 +8,11 @@ import org.bukkit.entity.LivingEntity;
  *
  * @author Saukiya
  */
-public class UpdateEventData implements EventData {
+public class UpdateData implements EventData {
 
     private final LivingEntity entity;
 
-    public UpdateEventData(LivingEntity entity) {
+    public UpdateData(LivingEntity entity) {
         this.entity = entity;
     }
 

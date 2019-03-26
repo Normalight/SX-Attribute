@@ -1,12 +1,13 @@
 package github.saukiya.sxattribute.data.attribute;
 
 import github.saukiya.sxattribute.SXAttribute;
-import github.saukiya.sxattribute.data.RegisterSlot;
+import github.saukiya.sxattribute.api.Sx;
+import github.saukiya.sxattribute.data.SlotData;
 import github.saukiya.sxattribute.data.condition.SXConditionManager;
 import github.saukiya.sxattribute.data.condition.SXConditionReturnType;
 import github.saukiya.sxattribute.data.condition.SXConditionType;
 import github.saukiya.sxattribute.data.condition.SubCondition;
-import github.saukiya.sxattribute.data.eventdata.sub.UpdateEventData;
+import github.saukiya.sxattribute.data.eventdata.sub.UpdateData;
 import github.saukiya.sxattribute.event.SXGetDataEvent;
 import github.saukiya.sxattribute.event.SXLoadItemDataEvent;
 import github.saukiya.sxattribute.util.Config;
@@ -54,7 +55,7 @@ public class SXAttributeManager implements Listener {
         int size = getSubAttributes().length;
         Bukkit.getPluginManager().registerEvents(this, plugin);
         for (int i = 0; i < size; i++) {
-            getSubAttributes()[i].setPriority(i).loadYaml();
+            getSubAttributes()[i].setPriority(i).loadConfig().onEnable();
         }
         Bukkit.getConsoleSender().sendMessage(Message.getMessagePrefix() + "Load §c" + getSubAttributes().length + "§r Attributes");
     }
@@ -63,7 +64,9 @@ public class SXAttributeManager implements Listener {
     public void onSubAttributePluginEnableEvent(PluginEnableEvent event) {
         for (SubAttribute subAttribute : subAttributes) {
             if (subAttribute.getPlugin().equals(event.getPlugin())) {
-                subAttribute.onEnable();
+                if (subAttribute.getListener() != null) {
+                    Bukkit.getPluginManager().registerEvents(subAttribute.getListener(), subAttribute.getPlugin());
+                }
             }
         }
         if (Arrays.stream(subAttributes).allMatch(subAttribute -> subAttribute.getPlugin().isEnabled())) {
@@ -79,8 +82,7 @@ public class SXAttributeManager implements Listener {
 
     public void onAttributeReload() {
         for (SubAttribute attribute : getSubAttributes()) {
-            attribute.loadYaml();
-            attribute.onReLoad();
+            attribute.loadConfig().onReLoad();
         }
     }
 
@@ -91,9 +93,9 @@ public class SXAttributeManager implements Listener {
      * @return SubAttribute / null
      */
     public static SubAttribute getSubAttribute(String attributeName) {
-        for (SubAttribute subAttribute1 : getSubAttributes()) {
-            if (subAttribute1.getName().equals(attributeName)) {
-                return subAttribute1;
+        for (SubAttribute subAttribute : getSubAttributes()) {
+            if (subAttribute.getName().equals(attributeName)) {
+                return subAttribute;
             }
         }
         return null;
@@ -214,11 +216,11 @@ public class SXAttributeManager implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                UpdateEventData updateEventData = new UpdateEventData(entity);
+                UpdateData updateData = new UpdateData(entity);
                 SXAttributeData attributeData = getEntityData(entity);
                 for (SubAttribute subAttribute : getSubAttributes()) {
                     if (subAttribute.containsType(SXAttributeType.UPDATE)) {
-                        subAttribute.eventMethod(attributeData.getValues()[subAttribute.getPriority()], updateEventData);
+                        subAttribute.eventMethod(attributeData.getValues()[subAttribute.getPriority()], updateData);
                     }
                 }
             }
@@ -238,11 +240,11 @@ public class SXAttributeManager implements Listener {
     public SXAttributeData getEntityData(LivingEntity entity) {
         SXAttributeData data = new SXAttributeData();
         data.add(getEntityDataMap().get(entity.getUniqueId()));
-        data.add(SXAttribute.getApi().getAPIAttribute(entity.getUniqueId()));
+        data.add(Sx.getAPIAttribute(entity.getUniqueId()));
         data.calculationCombatPower();
         data.add(defaultAttributeData);
         // TODO s
-        SXGetDataEvent event = new SXGetDataEvent(entity,data);
+        SXGetDataEvent event = new SXGetDataEvent(entity, data);
         Bukkit.getPluginManager().callEvent(event);
         data.correct();
         return data;
@@ -255,7 +257,7 @@ public class SXAttributeManager implements Listener {
      */
     public void clearEntityData(UUID uuid) {
         getEntityDataMap().remove(uuid);
-        SXAttribute.getApi().removeEntityAllPluginData(uuid);
+        Sx.removeEntityAllPluginData(uuid);
     }
 
     /**
@@ -273,8 +275,7 @@ public class SXAttributeManager implements Listener {
             Inventory inv = InventoryManager.get(player).getInventory();
             if (inv != null) {
                 List<ItemStack> itemList = new ArrayList<>();
-                List<Integer> whiteSlotList = Config.getConfig().getIntegerList(Config.PRG_INVENTORY_SLOT);
-                for (Integer i : whiteSlotList) {
+                for (Integer i : Config.getRpgInvSlotList()) {
                     ItemStack item = inv.getItem(i);
                     plugin.getItemDataManager().updateItem(item, (Player) entity);
                     if (item != null && item.getItemMeta().hasLore()) {
@@ -298,10 +299,10 @@ public class SXAttributeManager implements Listener {
             if (player != null) {
                 List<ItemStack> itemList = new ArrayList<>();
                 Inventory inv = player.getInventory();
-                for (RegisterSlot registerSlot : plugin.getRegisterSlotManager().getRegisterSlotList()) {
-                    ItemStack item = inv.getItem(registerSlot.getSlot());
+                for (SlotData slotData : plugin.getSlotDataManager().getSlotList()) {
+                    ItemStack item = inv.getItem(slotData.getSlot());
                     plugin.getItemDataManager().updateItem(item, (Player) entity);
-                    if (item != null && !item.getType().equals(Material.AIR) && item.getItemMeta().hasLore() && item.getItemMeta().getLore().stream().anyMatch(lore -> lore.contains(registerSlot.getName()))) {
+                    if (item != null && !item.getType().equals(Material.AIR) && item.getItemMeta().hasLore() && item.getItemMeta().getLore().stream().anyMatch(lore -> lore.contains(slotData.getName()))) {
                         itemList.add(item);
                     }
                 }

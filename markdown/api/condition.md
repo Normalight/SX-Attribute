@@ -89,7 +89,7 @@ import org.bukkit.inventory.ItemStack;
 public class TestCondition extends SubCondition {
 
     public TestCondition() {
-        super("Test",SXConditionType.HAND);
+        super(PacketListener,SXConditionType.HAND);
     }
 
     @Override

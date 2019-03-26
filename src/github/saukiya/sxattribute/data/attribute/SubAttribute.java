@@ -8,8 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +25,7 @@ import java.util.TreeMap;
  *
  * @author Saukiya
  */
-public abstract class SubAttribute {
+public abstract class SubAttribute extends Message.Tool {
 
     static Map<Integer, SubAttribute> registerAttributeMap = new TreeMap<>();
 
@@ -44,20 +44,18 @@ public abstract class SubAttribute {
     @Getter
     private final JavaPlugin plugin;
 
-    @Getter
-    private final int length;
-
     @NotNull
     private final SXAttributeType[] attributeTypes;
+
+    @Getter
+    @Setter
+    private int length;
 
     @Getter
     private int priority = -1;
 
     @Getter
-    private File file = null;
-
-    @Getter
-    private YamlConfiguration yaml;
+    private File file;
 
     /**
      * 实现一个属性类
@@ -70,8 +68,8 @@ public abstract class SubAttribute {
         this.plugin = plugin;
         this.length = valuesLength;
         this.attributeTypes = types.length == 0 ? new SXAttributeType[]{SXAttributeType.OTHER} : types;
-        int length = priorityList.length;
-        for (int i = 0; i < length; i++) {
+        this.file = new File(SXAttribute.getPluginFile(), "Attribute" + File.separator + getPlugin().getName() + File.separator + getName() + ".yml");
+        for (int i = 0; i < priorityList.length; i++) {
             String[] args = priorityList[i].split("#");
             if (args[0].equals(getName())) {
                 this.priority = args.length > 1 && !args[1].equals(getPlugin().getName()) ? -1 : i;
@@ -85,18 +83,17 @@ public abstract class SubAttribute {
      * 属性正常启动后
      * 加载配置文件
      */
-    public final void loadYaml() {
-        if (file == null) {
-            file = new File(SXAttribute.getPluginFile(), SubAttribute.class.getSimpleName() + File.separator + getPlugin().getName() + File.separator + getName() + ".yml");
-        }
+    public final SubAttribute loadConfig() {
         if (!file.exists()) {
-            yaml = defaultYaml(new YamlConfiguration());
+            YamlConfiguration yaml = defaultConfig(new YamlConfiguration());
             if (yaml != null) {
-                saveYaml();
+                setConfig(yaml);
+                saveConfig();
             }
         } else {
-            yaml = YamlConfiguration.loadConfiguration(file);
+            setConfig(YamlConfiguration.loadConfiguration(file));
         }
+        return this;
     }
 
     /**
@@ -105,27 +102,21 @@ public abstract class SubAttribute {
      *
      * @return Yaml
      */
-    protected YamlConfiguration defaultYaml(YamlConfiguration yaml) {
+    protected YamlConfiguration defaultConfig(YamlConfiguration config) {
         return null;
     }
 
     /**
      * 保存配置信息
      */
-    public void saveYaml() {
+    public void saveConfig() {
         try {
-            yaml.save(file);
+            config().save(file);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * 清除配置信息
-     */
-    public void clearYaml() {
-        yaml = null;
-    }
 
     /**
      * 设置优先级
@@ -171,7 +162,7 @@ public abstract class SubAttribute {
             Bukkit.getConsoleSender().sendMessage(Message.getMessagePrefix() + "§cAttribute >>  §7[§8NULL§4|§c" + getName() + "§7] §cNull Plugin!");
         } else if (getPriority() < 0) {
             Bukkit.getConsoleSender().sendMessage("[" + getPlugin().getName() + "] §8Attribute >> Disable §7[§8" + getPlugin().getName() + "§4|§8" + getName() + "§7] §8!");
-        } else if (SXAttribute.isPluginEnabled()) {
+        } else if (Bukkit.getPluginManager().getPlugin("SX-Attribute").isEnabled()) {
             Bukkit.getConsoleSender().sendMessage("[" + getPlugin().getName() + "] §cAttribute >> §cSXAttribute is Enabled , Unable to register §7[§c" + getPlugin().getName() + "§4|§c" + getName() + "§7]§c !");
         } else {
             SubAttribute attribute = registerAttributeMap.put(getPriority(), this);
@@ -183,22 +174,26 @@ public abstract class SubAttribute {
         }
     }
 
+    public Listener getListener() {
+        return null;
+    }
+
     /**
-     * 属性注册启动时执行的方法
+     * 启动时执行的方法
      */
     public void onEnable() {
 
     }
 
     /**
-     * 属性关闭时执行的方法
+     * 关闭时执行的方法
      */
     public void onDisable() {
 
     }
 
     /**
-     * 插件在重载时执行的方法
+     * 重载时执行的方法
      */
     public void onReLoad() {
 
@@ -271,9 +266,5 @@ public abstract class SubAttribute {
     public static double getNumber(String lore) {
         String str = lore.replaceAll("\u00a7+[a-z0-9]", "").replaceAll("[^-0-9.]", "");
         return str.length() == 0 || str.replaceAll("[^.]", "").length() > 1 ? 0D : Double.valueOf(str);
-    }
-
-    public final void send(LivingEntity entity, String loc, Object... args) {
-
     }
 }

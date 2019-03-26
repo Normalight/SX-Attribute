@@ -4,8 +4,7 @@ import github.saukiya.sxattribute.data.attribute.SXAttributeType;
 import github.saukiya.sxattribute.data.attribute.SubAttribute;
 import github.saukiya.sxattribute.data.eventdata.EventData;
 import github.saukiya.sxattribute.data.eventdata.sub.DamageData;
-import github.saukiya.sxattribute.util.Config;
-import github.saukiya.sxattribute.util.Message;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -27,14 +26,23 @@ public class Real extends SubAttribute {
     }
 
     @Override
+    protected YamlConfiguration defaultConfig(YamlConfiguration config) {
+        config.set("Message.Holo", "&c&o破甲");
+        config.set("Message.Battle", "[ACTIONBAR]&c{0}&6 被 &c{1}&6 破甲了!");
+        config.set("Real.DiscernName", "破甲几率");
+        config.set("Real.CombatPower", 1);
+        return config;
+    }
+
+    @Override
     public void eventMethod(double[] values, EventData eventData) {
         if (eventData instanceof DamageData) {
             if (probability(values[0])) {
                 DamageData damageData = (DamageData) eventData;
                 damageData.getEffectiveAttributeList().add(getName());
-                damageData.sendHolo(Message.getMsg(Message.PLAYER__HOLOGRAPHIC__REAL));
-                Message.send(damageData.getAttacker(), Message.PLAYER__BATTLE__REAL, damageData.getDefenderName(), getFirstPerson());
-                Message.send(damageData.getDefender(), Message.PLAYER__BATTLE__REAL, getFirstPerson(), damageData.getAttackerName());
+                damageData.sendHolo(getString("Message.Holo"));
+                send(damageData.getAttacker(), "Message.Battle", damageData.getDefenderName(), getFirstPerson());
+                send(damageData.getDefender(), "Message.Battle", getFirstPerson(), damageData.getAttackerName());
             }
         }
     }
@@ -51,13 +59,19 @@ public class Real extends SubAttribute {
 
     @Override
     public void loadAttribute(double[] values, String lore) {
-        if (lore.contains(Config.getConfig().getString(Config.NAME_REAL))) {
+        if (lore.contains(getString("Real.DiscernName"))) {
             values[0] += getNumber(lore);
         }
     }
 
     @Override
+    public void correct(double[] values) {
+        super.correct(values);
+        values[0] = Math.min(values[0], config().getInt("Real.UpperLimit", 100));
+    }
+
+    @Override
     public double calculationCombatPower(double[] values) {
-        return values[0] * Config.getConfig().getInt(Config.VALUE_REAL);
+        return values[0] * config().getInt("Real.CombatPower");
     }
 }

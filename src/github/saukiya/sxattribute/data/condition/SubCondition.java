@@ -197,7 +197,7 @@ public abstract class SubCondition {
             Bukkit.getConsoleSender().sendMessage(Message.getMessagePrefix() + "§cCondition >> §7[§8NULL§4|§c" + getName() + "§7] §cNull Plugin!");
         } else if (this.getPriority() < 0) {
             Bukkit.getConsoleSender().sendMessage("[" + getPlugin().getName() + "] §8Condition >> Disable §7[§8" + getPlugin().getName() + "§4|§8" + getName() + "§7] §8!");
-        } else if (SXAttribute.isPluginEnabled()) {
+        } else if (Bukkit.getPluginManager().getPlugin("SX-Attribute").isEnabled()) {
             Bukkit.getConsoleSender().sendMessage("[" + getPlugin().getName() + "] §cCondition >> §cSXAttribute is Enabled , Unable to register §7[§c" + getPlugin().getName() + "§4|§c" + getName() + "§7]§c !");
         } else {
             SubCondition condition = registerConditionMap.put(getPriority(), this);

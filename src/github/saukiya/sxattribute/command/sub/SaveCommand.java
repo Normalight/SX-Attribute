@@ -3,13 +3,17 @@ package github.saukiya.sxattribute.command.sub;
 import github.saukiya.sxattribute.SXAttribute;
 import github.saukiya.sxattribute.command.SenderType;
 import github.saukiya.sxattribute.command.SubCommand;
+import github.saukiya.sxattribute.data.itemdata.ItemDataManager;
+import github.saukiya.sxattribute.data.itemdata.ItemGenerator;
 import github.saukiya.sxattribute.util.Message;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 保存物品指令(非完全保存)
@@ -53,6 +57,9 @@ public class SaveCommand extends SubCommand {
 
     @Override
     public List<String> onTabComplete(SXAttribute plugin, CommandSender sender, String[] args) {
+        if (args.length == 3) {
+            return ItemDataManager.getGenerators().stream().map(ItemGenerator::getType).collect(Collectors.toList());
+        }
         return null;
     }
 }

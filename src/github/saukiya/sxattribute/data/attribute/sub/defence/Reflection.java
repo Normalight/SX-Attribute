@@ -4,14 +4,10 @@ import github.saukiya.sxattribute.data.attribute.SXAttributeType;
 import github.saukiya.sxattribute.data.attribute.SubAttribute;
 import github.saukiya.sxattribute.data.eventdata.EventData;
 import github.saukiya.sxattribute.data.eventdata.sub.DamageData;
-import github.saukiya.sxattribute.util.Config;
-import github.saukiya.sxattribute.util.Message;
-import org.bukkit.Bukkit;
 import org.bukkit.EntityEffect;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
@@ -32,7 +28,18 @@ public class Reflection extends SubAttribute {
         super(plugin, 2, SXAttributeType.DEFENCE);
     }
 
-    // TODO 更正EntityDamageByEntityEvent 过老问题
+    @Override
+    protected YamlConfiguration defaultConfig(YamlConfiguration config) {
+        config.set("Message.Holo", "&6&o反伤: &b&o{0}");
+        config.set("Message.Battle", "[ACTIONBAR]&c{0}&6 被 &c{1}&6 反弹伤害了!");
+        config.set("ReflectionRate.DiscernName", "反射几率");
+        config.set("ReflectionRate.UpperLimit", 80);
+        config.set("ReflectionRate.CombatPower", 1);
+        config.set("Reflection.DiscernName", "反射比例");
+        config.set("Reflection.CombatPower", 1);
+        return config;
+    }
+
     @Override
     public void eventMethod(double[] values, EventData eventData) {
         if (eventData instanceof DamageData) {
@@ -42,16 +49,13 @@ public class Reflection extends SubAttribute {
                     damageData.getEffectiveAttributeList().add(this.getName());
                     double damage = damageData.getDamage() * values[1] / 100;
                     LivingEntity damager = damageData.getAttacker();
-                    EntityDamageByEntityEvent event = new EntityDamageByEntityEvent(damageData.getDefender(), damager, EntityDamageEvent.DamageCause.CUSTOM, damage);
-                    Bukkit.getPluginManager().callEvent(event);
-                    if (event.isCancelled()) {
-                        return;
-                    }
+
+                    damager.damage(damage, damageData.getDefender());
                     damager.playEffect(EntityEffect.HURT);
-                    damager.setHealth(damager.getHealth() < event.getFinalDamage() ? 0 : (damager.getHealth() - event.getFinalDamage()));
-                    damageData.sendHolo(Message.getMsg(Message.PLAYER__HOLOGRAPHIC__REFLECTION, getDf().format(damage)));
-                    Message.send(damager, Message.PLAYER__BATTLE__REFLECTION, getFirstPerson(), damageData.getDefenderName(), getDf().format(damage));
-                    Message.send(damageData.getDefender(), Message.PLAYER__BATTLE__REFLECTION, damageData.getAttackerName(), getFirstPerson(), getDf().format(damage));
+
+                    damageData.sendHolo(getString("Message.Holo", getDf().format(damage)));
+                    send(damager, "Message.Battle", getFirstPerson(), damageData.getDefenderName(), getDf().format(damage));
+                    send(damageData.getDefender(), "Message.Battle", damageData.getAttackerName(), getFirstPerson(), getDf().format(damage));
                 }
             }
         }
@@ -78,16 +82,24 @@ public class Reflection extends SubAttribute {
 
     @Override
     public void loadAttribute(double[] values, String lore) {
-        if (lore.contains(Config.getConfig().getString(Config.NAME_REFLECTION_RATE))) {
+        if (lore.contains(getString("ReflectionRate.DiscernName"))) {
             values[0] += getNumber(lore);
         }
-        if (lore.contains(Config.getConfig().getString(Config.NAME_REFLECTION))) {
+        if (lore.contains(getString("Reflection.DiscernName"))) {
             values[1] += getNumber(lore);
         }
     }
 
     @Override
+    public void correct(double[] values) {
+        super.correct(values);
+        values[0] = Math.min(values[0], config().getInt("ReflectionRate.UpperLimit", 100));
+        values[1] = Math.min(values[0], config().getInt("Reflection.UpperLimit", 100));
+    }
+
+    @Override
     public double calculationCombatPower(double[] values) {
-        return values[0] * Config.getConfig().getInt(Config.VALUE_REFLECTION_RATE) + values[1] * Config.getConfig().getInt(Config.VALUE_REFLECTION);
+        return values[0] * config().getInt("ReflectionRate.CombatPower") +
+                values[1] * config().getInt("Reflection.CombatPower");
     }
 }

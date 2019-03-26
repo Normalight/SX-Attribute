@@ -1,13 +1,13 @@
 package github.saukiya.sxattribute.data.attribute.sub.defence;
 
-import github.saukiya.sxattribute.SXAttribute;
+import github.saukiya.sxattribute.api.Sx;
 import github.saukiya.sxattribute.data.attribute.SXAttributeType;
 import github.saukiya.sxattribute.data.attribute.SubAttribute;
 import github.saukiya.sxattribute.data.eventdata.EventData;
-import github.saukiya.sxattribute.util.Config;
 import github.saukiya.sxattribute.util.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -33,7 +33,7 @@ public class HealthRegen extends SubAttribute {
                     if (player != null && !player.isDead() && player.isOnline()) {
                         double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
                         if (player.getHealth() < maxHealth) {
-                            double healthRegen = SXAttribute.getApi().getEntityData(player).getValues(getName())[0];
+                            double healthRegen = Sx.getEntityData(player).getValues(getName())[0];
                             if (healthRegen > 0) {
                                 EntityRegainHealthEvent event = new EntityRegainHealthEvent(player, healthRegen, EntityRegainHealthEvent.RegainReason.CUSTOM);
                                 Bukkit.getPluginManager().callEvent(event);
@@ -51,16 +51,27 @@ public class HealthRegen extends SubAttribute {
                 this.cancel();
                 HealthRegen.this.onEnable();
                 Bukkit.getConsoleSender().sendMessage(Message.getMessagePrefix() + "§c启动完毕!");
-                Bukkit.getConsoleSender().sendMessage(Message.getMessagePrefix() + "§c如果此消息连续刷屏，请通过Yum重载本插件");
+                Bukkit.getConsoleSender().sendMessage(Message.getMessagePrefix() + "§c如果此消息连续刷屏，请反馈作者QQ: 1940208750");
             }
         }
     };
+
+
 
     /**
      * double[0] 生命回复
      */
     public HealthRegen(JavaPlugin plugin) {
         super(plugin, 1, SXAttributeType.OTHER);
+    }
+
+    @Override
+    protected YamlConfiguration defaultConfig(YamlConfiguration config) {
+        config.set("Health.DiscernName", "生命恢复");
+        config.set("Health.CombatPower", 1);
+        config.set("HealthScaled.Enabled", true);
+        config.set("HealthScaled.Value", 40);
+        return config;
     }
 
     @Override
@@ -89,13 +100,13 @@ public class HealthRegen extends SubAttribute {
 
     @Override
     public void loadAttribute(double[] values, String lore) {
-        if (lore.contains(Config.getConfig().getString(Config.NAME_HEALTH_REGEN))) {
+        if (lore.contains(getString("Health.DiscernName"))) {
             values[0] += getNumber(lore);
         }
     }
 
     @Override
     public double calculationCombatPower(double[] values) {
-        return values[0] * Config.getConfig().getInt(Config.VALUE_HEALTH_REGEN);
+        return values[0] * config().getInt("Health.CombatPower");
     }
 }

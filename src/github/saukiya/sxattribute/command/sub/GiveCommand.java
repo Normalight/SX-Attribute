@@ -26,11 +26,7 @@ public class GiveCommand extends SubCommand {
     @Override
     public void onCommand(SXAttribute plugin, CommandSender sender, String[] args) {
         if (args.length < 2) {
-            if (sender instanceof Player) {
-                plugin.getItemDataManager().sendItemMapToPlayer(sender, "");
-            } else {
-                plugin.getItemDataManager().sendItemMapToPlayer(sender);
-            }
+            plugin.getItemDataManager().sendItemMapToPlayer(sender, sender instanceof Player ? new String[]{""} : new String[0]);
             return;
         }
         Player player = null;

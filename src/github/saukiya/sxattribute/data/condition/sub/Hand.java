@@ -1,6 +1,6 @@
 package github.saukiya.sxattribute.data.condition.sub;
 
-import github.saukiya.sxattribute.SXAttribute;
+import github.saukiya.sxattribute.api.Sx;
 import github.saukiya.sxattribute.data.condition.SXConditionReturnType;
 import github.saukiya.sxattribute.data.condition.SXConditionType;
 import github.saukiya.sxattribute.data.condition.SubCondition;
@@ -22,6 +22,6 @@ public class Hand extends SubCondition {
 
     @Override
     public SXConditionReturnType determine(LivingEntity entity, ItemStack item, String lore) {
-        return (Config.getConfig().getStringList(Config.NAME_ARMOR).stream().anyMatch(lore::contains) || SXAttribute.getApi().getRegisterSlotList().stream().anyMatch(slot -> lore.contains(slot.getName()))) ? SXConditionReturnType.ITEM : SXConditionReturnType.NULL;
+        return (Config.getConfig().getStringList(Config.NAME_ARMOR).stream().anyMatch(lore::contains) || Sx.getRegisterSlotList().stream().anyMatch(slot -> lore.contains(slot.getName()))) ? SXConditionReturnType.ITEM : SXConditionReturnType.NULL;
     }
 }

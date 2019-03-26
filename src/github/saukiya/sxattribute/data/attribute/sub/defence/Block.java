@@ -4,8 +4,7 @@ import github.saukiya.sxattribute.data.attribute.SXAttributeType;
 import github.saukiya.sxattribute.data.attribute.SubAttribute;
 import github.saukiya.sxattribute.data.eventdata.EventData;
 import github.saukiya.sxattribute.data.eventdata.sub.DamageData;
-import github.saukiya.sxattribute.util.Config;
-import github.saukiya.sxattribute.util.Message;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -21,10 +20,21 @@ public class Block extends SubAttribute {
 
     /**
      * double[0] 格挡几率
-     * double[1] 格挡伤害
+     * double[1] 格挡比例
      */
     public Block(JavaPlugin plugin) {
         super(plugin, 2, SXAttributeType.DEFENCE);
+    }
+
+    @Override
+    protected YamlConfiguration defaultConfig(YamlConfiguration config) {
+        config.set("Message.Holo", "&2&o格挡: &b&o{0}");
+        config.set("Message.Battle", "[ACTIONBAR]&c{0}&6 格挡了 &c{1}&6 的部分伤害!");
+        config.set("BlockRate.DiscernName", "格挡几率");
+        config.set("BlockRate.CombatPower", 1);
+        config.set("Block.DiscernName", "格挡比例");
+        config.set("Block.CombatPower", 1);
+        return config;
     }
 
     @Override
@@ -36,9 +46,9 @@ public class Block extends SubAttribute {
                     damageData.getEffectiveAttributeList().add(this.getName());
                     double blockDamage = damageData.getDamage() * values[1] / 100;
                     damageData.setDamage(damageData.getDamage() - blockDamage);
-                    damageData.sendHolo(Message.getMsg(Message.PLAYER__HOLOGRAPHIC__BLOCK, getDf().format(blockDamage)));
-                    Message.send(damageData.getAttacker(), Message.PLAYER__BATTLE__BLOCK, damageData.getDefenderName(), getFirstPerson(), getDf().format(blockDamage));
-                    Message.send(damageData.getDefender(), Message.PLAYER__BATTLE__BLOCK, getFirstPerson(), damageData.getAttackerName(), getDf().format(blockDamage));
+                    damageData.sendHolo(getString("Message.Holo", getDf().format(blockDamage)));
+                    send(damageData.getAttacker(), "Message.Battle", damageData.getDefenderName(), getFirstPerson(), getDf().format(blockDamage));
+                    send(damageData.getDefender(), "Message.Battle", getFirstPerson(), damageData.getAttackerName(), getDf().format(blockDamage));
                 }
             }
         }
@@ -65,16 +75,23 @@ public class Block extends SubAttribute {
 
     @Override
     public void loadAttribute(double[] values, String lore) {
-        if (lore.contains(Config.getConfig().getString(Config.NAME_BLOCK_RATE))) {
+        if (lore.contains(getString("BlockRate.DiscernName"))) {
             values[0] += getNumber(lore);
         }
-        if (lore.contains(Config.getConfig().getString(Config.NAME_BLOCK))) {
+        if (lore.contains(getString("Block.DiscernName"))) {
             values[1] += getNumber(lore);
         }
     }
 
     @Override
+    public void correct(double[] values) {
+        super.correct(values);
+        values[0] = Math.min(values[0], config().getInt("BlockRate.UpperLimit", 100));
+        values[1] = Math.min(values[0], config().getInt("Block.UpperLimit", 100));
+    }
+
+    @Override
     public double calculationCombatPower(double[] values) {
-        return values[0] * Config.getConfig().getInt(Config.VALUE_BLOCK_RATE) + values[1] * Config.getConfig().getInt(Config.VALUE_BLOCK);
+        return values[0] * config().getInt("BlockRate.CombatPower") + values[1] * config().getInt("Block.CombatPower");
     }
 }

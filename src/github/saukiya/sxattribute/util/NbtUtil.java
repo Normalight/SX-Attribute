@@ -1,5 +1,6 @@
 package github.saukiya.sxattribute.util;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
@@ -13,6 +14,7 @@ import java.util.List;
  * @author Saukiya
  */
 
+@Getter
 public class NbtUtil {
 
     private Class<?> xCraftItemStack;
@@ -76,51 +78,6 @@ public class NbtUtil {
         Bukkit.getConsoleSender().sendMessage(Message.getMessagePrefix() + "Load NbtUtil!");
     }
 
-    /**
-     * 获取物品攻击速度
-     *
-     * @param item ItemStack
-     * @return double
-     */
-    public Double getAttackSpeed(ItemStack item) {
-        switch (item.getType().name()) {
-            case "DIAMOND_HOE":
-                return 0D;
-            case "IRON_HOE":
-                return -1D;
-            case "STONE_HOE":
-                return -2D;
-            case "DIAMOND_SWORD":
-            case "IRON_SWORD":
-            case "GOLD_SWORD":
-            case "STONE_SWORD":
-            case "WOOD_SWORD":
-                return -2.4D;
-            case "DIAMOND_PICKAXE":
-            case "IRON_PICKAXE":
-            case "GOLD_PICKAXE":
-            case "STONE_PICKAXE":
-            case "WOOD_PICKAXE":
-                return -2.8D;
-            case "DIAMOND_SPADE":
-            case "IRON_SPADE":
-            case "GOLD_SPADE":
-            case "STONE_SPADE":
-            case "WOOD_SPADE":
-            case "DIAMOND_AXE":
-            case "GOLD_AXE":
-            case "WOOD_HOE":
-            case "GOLD_HOE":
-                return -3D;
-            case "IRON_AXE":
-                return -3.1D;
-            case "STONE_AXE":
-            case "WOOD_AXE":
-                return -3.2D;
-        }
-        return null;
-    }
-
     public boolean isEquipment(ItemStack item) {
         switch (item.getType().name()) {
             case "DIAMOND_HELMET":
@@ -169,39 +126,9 @@ public class NbtUtil {
             case "WOOD_SPADE":
             case "WOOD_PICKAXE":
                 return true;
+            default:
+                return false;
         }
-        return false;
-    }
-
-    /**
-     * 设置物品攻击速度
-     *
-     * @param item ItemStack
-     * @return ItemStack
-     */
-    public ItemStack setAttackSpeed(ItemStack item) {
-        if (item != null && !item.getType().name().equals("AIR")) {
-            try {
-                Object nmsItem = xAsNMSCopay.invoke(xCraftItemStack, item);
-                Object compound = ((Boolean) xHasTag.invoke(nmsItem)) ? xGetTag.invoke(nmsItem) : xNBTTagCompound.newInstance();
-                Object modifiers = xNBTTagList.newInstance();
-                Object attackSpeed = xNBTTagCompound.newInstance();
-                xSet.invoke(attackSpeed, "AttributeName", xNewNBTTagString.newInstance("generic.attackSpeed"));
-                xSet.invoke(attackSpeed, "Name", xNewNBTTagString.newInstance("AttackSpeed"));
-                xSet.invoke(attackSpeed, "Amount", xNewNBTTagDouble.newInstance(getAttackSpeed(item)));
-                xSet.invoke(attackSpeed, "Operation", xNewNBTTagInt.newInstance(0));
-                xSet.invoke(attackSpeed, "UUIDLeast", xNewNBTTagInt.newInstance(20000));
-                xSet.invoke(attackSpeed, "UUIDMost", xNewNBTTagInt.newInstance(1000));
-                xSet.invoke(attackSpeed, "Slot", xNewNBTTagString.newInstance("mainhand"));
-                xAdd.invoke(modifiers, attackSpeed);
-                xSet.invoke(compound, "AttributeModifiers", modifiers);
-                xSetTag.invoke(nmsItem, compound);
-                item.setItemMeta(((ItemStack) xAsBukkitCopy.invoke(xCraftItemStack, nmsItem)).getItemMeta());
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
-                e.printStackTrace();
-            }
-        }
-        return item;
     }
 
     /**
@@ -235,7 +162,7 @@ public class NbtUtil {
         try {
             Object nmsItem = xAsNMSCopay.invoke(xCraftItemStack, item);
             Object itemTag = ((Boolean) xHasTag.invoke(nmsItem)) ? xGetTag.invoke(nmsItem) : xNBTTagCompound.newInstance();
-            return "[" + item.getTypeId() + ":" + item.getDurability() + "-" + item.hashCode() + "]>" + itemTag.toString();
+            return "[" + item.getType().name() + ":" + item.getDurability() + "-" + item.hashCode() + "]>" + itemTag.toString();
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
             return null;
         }

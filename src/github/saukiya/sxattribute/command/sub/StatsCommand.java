@@ -1,6 +1,7 @@
 package github.saukiya.sxattribute.command.sub;
 
 import github.saukiya.sxattribute.SXAttribute;
+import github.saukiya.sxattribute.api.Sx;
 import github.saukiya.sxattribute.command.SenderType;
 import github.saukiya.sxattribute.command.SubCommand;
 import github.saukiya.sxattribute.data.attribute.SXAttributeData;
@@ -65,7 +66,7 @@ public class StatsCommand extends SubCommand implements Listener {
     }
 
     public void openStatsInventory(Player player, Player... openInvPlayer) {
-        SXAttributeData attributeData = SXAttribute.getApi().getEntityData(player);
+        SXAttributeData attributeData = Sx.getEntityData(player);
         Inventory inv = Bukkit.createInventory(null, 27, Message.getMsg(Message.INVENTORY__STATS__NAME));
         ItemStack stainedGlass = new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 15);
         ItemMeta glassMeta = stainedGlass.getItemMeta();

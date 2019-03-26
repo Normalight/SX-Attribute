@@ -17,10 +17,6 @@ public class SXAttributeType {
      */
     public static final SXAttributeType DEFENCE = new SXAttributeType(Type.DEFENCE);
     /**
-     * 伤害中立属性(目前仅玩家)
-     */
-    public static final SXAttributeType DAMAGE = new SXAttributeType(Type.DAMAGE);
-    /**
      * 更新属性(目前仅玩家)
      */
     public static final SXAttributeType UPDATE = new SXAttributeType(Type.UPDATE);

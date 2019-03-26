@@ -29,8 +29,8 @@ public interface ItemGenerator {
      * 实例化物品生成器
      *
      * @param pathName 路径
-     * @param key 编号
-     * @param config 配置
+     * @param key      编号
+     * @param config   配置
      * @return ItemGenerator
      */
     ItemGenerator newGenerator(String pathName, String key, ConfigurationSection config);
@@ -76,7 +76,7 @@ public interface ItemGenerator {
      * null则不带save功能
      *
      * @param saveItem ItemStack
-     * @param config ConfigurationSection
+     * @param config   ConfigurationSection
      * @return
      */
     ConfigurationSection saveItem(ItemStack saveItem, ConfigurationSection config);

@@ -2,33 +2,38 @@ package github.saukiya.sxattribute.api;
 
 import github.saukiya.sxattribute.SXAttribute;
 import github.saukiya.sxattribute.data.RandomStringManager;
-import github.saukiya.sxattribute.data.RegisterSlot;
+import github.saukiya.sxattribute.data.SlotData;
 import github.saukiya.sxattribute.data.attribute.SXAttributeData;
 import github.saukiya.sxattribute.data.condition.SXConditionType;
 import github.saukiya.sxattribute.data.condition.SubCondition;
 import github.saukiya.sxattribute.util.NbtUtil;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * API 获取方式为 SXAttribute.getApi()
+ * Sx
  *
  * @author Saukiya
  */
-public class API {
+public class Sx {
 
-    private final Map<UUID, Map<Class<?>, SXAttributeData>> map = new HashMap<>();
-    private final SXAttribute plugin;
+    static Map<UUID, Map<Class<?>, SXAttributeData>> map = new ConcurrentHashMap<>();
+    static SXAttribute plugin;
 
-    public API(SXAttribute plugin) {
-        this.plugin = plugin;
+    public Sx(SXAttribute plugin) {
+        if (Sx.plugin == null && plugin != null) Sx.plugin = plugin;
     }
 
-    public SXAttributeData getAPIAttribute(UUID uuid) {
+    public static SXAttributeData getAPIAttribute(UUID uuid) {
         SXAttributeData attributeData = new SXAttributeData();
+        if (map.containsKey(uuid)) {
+            
+        }
         for (SXAttributeData data : map.getOrDefault(uuid, new HashMap<>()).values()) {
             attributeData.add(data);
         }
@@ -37,11 +42,10 @@ public class API {
 
     /**
      * 获取 ItemUtils(NBT反射类)
-     * key值结构为:SX-Attribute-{key}
      *
      * @return ItemUtils
      */
-    public NbtUtil getNbtUtil() {
+    public static NbtUtil getNbtUtil() {
         return plugin.getNbtUtil();
     }
 
@@ -50,12 +54,13 @@ public class API {
      *
      * @return RandomStringManager
      */
-    public RandomStringManager getRandomStringManager() {
+    public static RandomStringManager getRandomStringManager() {
         return plugin.getRandomStringManager();
     }
 
-    public List<RegisterSlot> getRegisterSlotList() {
-        return plugin.getRegisterSlotManager().getRegisterSlotList();
+
+    public static List<SlotData> getRegisterSlotList() {
+        return plugin.getSlotDataManager().getSlotList();
     }
 
     /**
@@ -66,7 +71,7 @@ public class API {
      * @param uuid          实体UUID
      * @param attributeData / null
      */
-    public void setProjectileData(UUID uuid, SXAttributeData attributeData) {
+    public static void setProjectileData(UUID uuid, SXAttributeData attributeData) {
         if (attributeData != null && attributeData.isValid()) {
             plugin.getAttributeManager().getEntityDataMap().put(uuid, attributeData);
         }
@@ -78,7 +83,7 @@ public class API {
      * @param uuid 实体UUID
      * @return SXAttributeData / null
      */
-    public SXAttributeData getProjectileData(UUID uuid, boolean remove) {
+    public static SXAttributeData getProjectileData(UUID uuid, boolean remove) {
         return remove ? plugin.getAttributeManager().getEntityDataMap().remove(uuid) : plugin.getAttributeManager().getEntityDataMap().get(uuid);
     }
 
@@ -88,7 +93,7 @@ public class API {
      * @param livingEntity LivingEntity
      * @return SXAttributeData / null
      */
-    public SXAttributeData getEntityData(LivingEntity livingEntity) {
+    public static SXAttributeData getEntityData(LivingEntity livingEntity) {
         return plugin.getAttributeManager().getEntityData(livingEntity);
     }
 
@@ -99,7 +104,7 @@ public class API {
      * @param uuid UUID
      * @return SXAttributeData / null
      */
-    public SXAttributeData getEntityAPIData(Class<?> c, UUID uuid) {
+    public static SXAttributeData getEntityAPIData(Class<?> c, UUID uuid) {
         return map.containsKey(uuid) ? map.get(uuid).get(c) : null;
     }
 
@@ -110,7 +115,7 @@ public class API {
      * @param uuid UUID
      * @return boolean
      */
-    public boolean hasEntityAPIData(Class<?> c, UUID uuid) {
+    public static boolean hasEntityAPIData(Class<?> c, UUID uuid) {
         return map.containsKey(uuid) && map.get(uuid).containsKey(c);
     }
 
@@ -121,7 +126,7 @@ public class API {
      * @param uuid          UUID
      * @param attributeData SXAttributeData
      */
-    public void setEntityAPIData(Class<?> c, UUID uuid, SXAttributeData attributeData) {
+    public static void setEntityAPIData(Class<?> c, UUID uuid, SXAttributeData attributeData) {
         map.computeIfAbsent(uuid, k -> new HashMap<>()).put(c, attributeData);
     }
 
@@ -133,8 +138,8 @@ public class API {
      * @param uuid 实体UUID
      * @return SXAttributeData / null
      */
-    public SXAttributeData removeEntityAPIData(Class<?> c, UUID uuid) {
-        Map<Class<?>, SXAttributeData> map = this.map.get(uuid);
+    public static SXAttributeData removeEntityAPIData(Class<?> c, UUID uuid) {
+        Map<Class<?>, SXAttributeData> map = Sx.map.get(uuid);
         return map != null ? map.remove(c) : null;
     }
 
@@ -143,7 +148,7 @@ public class API {
      *
      * @param c Class
      */
-    public void removePluginAllEntityData(Class<?> c) {
+    public static void removePluginAllEntityData(Class<?> c) {
         for (Map<Class<?>, SXAttributeData> statsMap : map.values()) {
             statsMap.remove(c);
         }
@@ -154,7 +159,7 @@ public class API {
      *
      * @param uuid 实体UUID
      */
-    public void removeEntityAllPluginData(UUID uuid) {
+    public static void removeEntityAllPluginData(UUID uuid) {
         map.remove(uuid);
     }
 
@@ -168,7 +173,7 @@ public class API {
      * @param loreList List
      * @return SXAttributeData
      */
-    public SXAttributeData getLoreData(LivingEntity entity, SXConditionType type, List<String> loreList) {
+    public static SXAttributeData getLoreData(LivingEntity entity, SXConditionType type, List<String> loreList) {
         return plugin.getAttributeManager().getListStats(entity, type, loreList);
     }
 
@@ -183,7 +188,7 @@ public class API {
      * @param item         ItemStack[]
      * @return SXAttributeData
      */
-    public SXAttributeData getItemData(LivingEntity livingEntity, SXConditionType type, ItemStack... item) {
+    public static SXAttributeData getItemData(LivingEntity livingEntity, SXConditionType type, ItemStack... item) {
         return plugin.getAttributeManager().getItemData(livingEntity, type, item);
     }
 
@@ -193,8 +198,8 @@ public class API {
      * @param livingEntity LivingEntity
      * @return String
      */
-    public String getEntityName(LivingEntity livingEntity) {
-        return plugin.getOnHealthChangeDisplayListener().getEntityName(livingEntity);
+    public static String getEntityName(LivingEntity livingEntity) {
+        return plugin.getOnHealthChangeListener().getEntityName(livingEntity);
     }
 
     /**
@@ -206,7 +211,7 @@ public class API {
      * @param item   ItemStack
      * @return boolean
      */
-    public boolean isUse(LivingEntity entity, SXConditionType type, ItemStack item) {
+    public static boolean isUse(LivingEntity entity, SXConditionType type, ItemStack item) {
         return plugin.getAttributeManager().isUse(entity, type, item);
     }
 
@@ -216,7 +221,7 @@ public class API {
      * @param item ItemStack
      * @return int / -1
      */
-    public int getItemLevel(ItemStack item) {
+    public static int getItemLevel(ItemStack item) {
         return SubCondition.getItemLevel(item);
     }
 
@@ -227,7 +232,7 @@ public class API {
      * @param entity LivingEntity
      * @return level
      */
-    public int getEntityLevel(LivingEntity entity) {
+    public static int getEntityLevel(LivingEntity entity) {
         return SubCondition.getLevel(entity);
     }
 
@@ -237,7 +242,7 @@ public class API {
      *
      * @param entity LivingEntity
      */
-    public void updateData(LivingEntity entity) {
+    public static void updateData(LivingEntity entity) {
         plugin.getAttributeManager().updateData(entity);
     }
 
@@ -246,7 +251,7 @@ public class API {
      *
      * @param entity LivingEntity
      */
-    public void attributeUpdate(LivingEntity entity) {
+    public static void attributeUpdate(LivingEntity entity) {
         plugin.getAttributeManager().attributeUpdateEvent(entity);
     }
 
@@ -258,8 +263,12 @@ public class API {
      * @param player  Player
      * @return ItemStack
      */
-    public ItemStack getItem(String itemKey, Player player) {
+    public static ItemStack getItem(String itemKey, Player player) {
         return plugin.getItemDataManager().getItem(itemKey, player);
+    }
+
+    public static double getMaxHealth(LivingEntity entity) {
+        return SXAttribute.getVersionSplit()[1] >= 9 ? entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue() : entity.getMaxHealth();
     }
 
     /**
@@ -268,7 +277,7 @@ public class API {
      * @param itemKey String
      * @return ItemStack
      */
-    public boolean hasItem(String itemKey) {
+    public static boolean hasItem(String itemKey) {
         return plugin.getItemDataManager().hasItem(itemKey);
     }
 
@@ -277,7 +286,7 @@ public class API {
      *
      * @return Set
      */
-    public Set<String> getItemList() {
+    public static Set<String> getItemList() {
         return plugin.getItemDataManager().getItemList();
     }
 }

@@ -1,9 +1,10 @@
 package github.saukiya.sxattribute.data.condition.sub;
 
 import github.saukiya.sxattribute.SXAttribute;
-import github.saukiya.sxattribute.data.itemdata.ItemDataManager;
+import github.saukiya.sxattribute.api.Sx;
 import github.saukiya.sxattribute.data.condition.SXConditionReturnType;
 import github.saukiya.sxattribute.data.condition.SubCondition;
+import github.saukiya.sxattribute.data.itemdata.ItemDataManager;
 import github.saukiya.sxattribute.event.SXItemSpawnEvent;
 import github.saukiya.sxattribute.event.SXItemUpdateEvent;
 import github.saukiya.sxattribute.util.Config;
@@ -108,12 +109,12 @@ public class Durability extends SubCondition implements Listener {
                                 clearItem(player, item);
                             }
                             player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_BREAK, 1f, 1f);
-                            SXAttribute.getApi().updateData(player);
-                            SXAttribute.getApi().attributeUpdate(player);
+                            Sx.updateData(player);
+                            Sx.attributeUpdate(player);
                             return true;
                         }
-                        SXAttribute.getApi().updateData(player);
-                        SXAttribute.getApi().attributeUpdate(player);
+                        Sx.updateData(player);
+                        Sx.attributeUpdate(player);
                     }
                     // 设定耐久条
                     if (item.getType().getMaxDurability() != 0 && !getUnbreakable(meta)) {
@@ -145,9 +146,9 @@ public class Durability extends SubCondition implements Listener {
         ItemMeta itemMeta = event.getItem().getItemMeta();
         ItemMeta oldItemMeta = event.getOldItem().getItemMeta();
         if (itemMeta.hasLore() && oldItemMeta.hasLore()) {
-        List<String> itemList = itemMeta.getLore();
-        List<String> oldItemList = oldItemMeta.getLore();
-        String detect = Config.getConfig().getString(Config.NAME_DURABILITY);
+            List<String> itemList = itemMeta.getLore();
+            List<String> oldItemList = oldItemMeta.getLore();
+            String detect = Config.getConfig().getString(Config.NAME_DURABILITY);
             for (int i = itemList.size() - 1; i >= 0; i--) {
                 if (itemList.get(i).contains(detect)) {
                     for (int i1 = oldItemList.size() - 1; i1 >= 0; i1--) {
@@ -166,15 +167,14 @@ public class Durability extends SubCondition implements Listener {
                 }
             }
         }
+        editDurability(event.getPlayer(), event.getItem(), 0);
     }
 
     @Override
     public SXConditionReturnType determine(LivingEntity entity, ItemStack item, String lore) {
         if (lore.contains(Config.getConfig().getString(Config.NAME_DURABILITY))) {
-            if (getDurability(lore) <= 0) {
-                if (entity instanceof Player && item != null) {
-                    Message.send((Player) entity, Message.getMsg(Message.PLAYER__NO_DURABILITY, getItemName(item)));
-                }
+            if (getDurability(lore) <= 0 && item != null) {
+                Message.send(entity, Message.PLAYER__NO_DURABILITY, getItemName(item));
                 return SXConditionReturnType.ITEM;
             }
         }

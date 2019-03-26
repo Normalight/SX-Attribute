@@ -143,7 +143,7 @@ public class Metrics {
      */
     private static void sendData(JSONObject data) throws Exception {
         if (data == null) {
-            throw new IllegalArgumentException("Data cannot be null!");
+            throw new IllegalArgumentException("DataLoader cannot be null!");
         }
         if (Bukkit.isPrimaryThread()) {
             throw new IllegalAccessException("This Method must not be called from the main thread!");

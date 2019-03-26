@@ -3,7 +3,7 @@ package github.saukiya.sxattribute.data.attribute.sub.defence;
 import github.saukiya.sxattribute.data.attribute.SXAttributeType;
 import github.saukiya.sxattribute.data.attribute.SubAttribute;
 import github.saukiya.sxattribute.data.eventdata.EventData;
-import github.saukiya.sxattribute.util.Config;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -25,6 +25,14 @@ public class Toughness extends SubAttribute {
     }
 
     @Override
+    protected YamlConfiguration defaultConfig(YamlConfiguration config) {
+        config.set("Toughness.DiscernName", "韧性");
+        config.set("Toughness.UpperLimit", 80);
+        config.set("Toughness.CombatPower", 1);
+        return config;
+    }
+
+    @Override
     public void eventMethod(double[] values, EventData eventData) {
     }
 
@@ -40,13 +48,19 @@ public class Toughness extends SubAttribute {
 
     @Override
     public void loadAttribute(double[] values, String lore) {
-        if (lore.contains(Config.getConfig().getString(Config.NAME_TOUGHNESS))) {
+        if (lore.contains(getString("Toughness.DiscernName"))) {
             values[0] += getNumber(lore);
         }
     }
 
     @Override
+    public void correct(double[] values) {
+        super.correct(values);
+        values[0] = Math.min(values[0], config().getInt("Toughness.UpperLimit", 100));
+    }
+
+    @Override
     public double calculationCombatPower(double[] values) {
-        return values[0] * Config.getConfig().getInt(Config.VALUE_TOUGHNESS);
+        return values[0] * config().getInt("Toughness.CombatPower");
     }
 }

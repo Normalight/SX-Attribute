@@ -1,14 +1,14 @@
 package github.saukiya.sxattribute.data.attribute.sub.other;
 
 import github.saukiya.sxattribute.SXAttribute;
+import github.saukiya.sxattribute.api.Sx;
 import github.saukiya.sxattribute.data.attribute.SXAttributeType;
 import github.saukiya.sxattribute.data.attribute.SubAttribute;
 import github.saukiya.sxattribute.data.eventdata.EventData;
-import github.saukiya.sxattribute.util.Config;
 import github.saukiya.sxattribute.util.Message;
 import github.saukiya.sxlevel.event.ChangeType;
 import github.saukiya.sxlevel.event.SXExpChangeEvent;
-import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -33,9 +33,16 @@ public class ExpAddition extends SubAttribute {
     }
 
     @Override
-    public void onEnable() {
-        // 属性启动时注册监听器
-        Bukkit.getPluginManager().registerEvents(SXAttribute.isSxLevel() ? new OnSXExpChangeListener() : new OnExpChangeListener(), getPlugin());
+    protected YamlConfiguration defaultConfig(YamlConfiguration config) {
+        config.set("Message", Message.getMessagePrefix() + "&7你的经验增加了 &6{0}&7! [&a+{1}%&7]");
+        config.set("ExpAddition.DiscernName", "经验增幅");
+        config.set("ExpAddition.CombatPower", 1);
+        return config;
+    }
+
+    @Override
+    public Listener getListener() {
+        return SXAttribute.isSxLevel() ? new OnSXExpChangeListener() : new OnExpChangeListener();
     }
 
     @Override
@@ -55,14 +62,20 @@ public class ExpAddition extends SubAttribute {
 
     @Override
     public void loadAttribute(double[] values, String lore) {
-        if (lore.contains(Config.getConfig().getString(Config.NAME_EXP_ADDITION))) {
+        if (lore.contains(getString("ExpAddition.DiscernName"))) {
             values[0] += getNumber(lore);
         }
     }
 
     @Override
+    public void correct(double[] values) {
+        super.correct(values);
+        values[0] = Math.min(values[0], config().getInt("ExpAddition.UpperLimit", Integer.MAX_VALUE));
+    }
+
+    @Override
     public double calculationCombatPower(double[] values) {
-        return values[0] * Config.getConfig().getInt(Config.VALUE_EXP_ADDITION);
+        return values[0] * config().getInt("ExpAddition.CombatPower");
     }
 
     /**
@@ -74,10 +87,10 @@ public class ExpAddition extends SubAttribute {
         @EventHandler
         private void onExpChangeEvent(PlayerExpChangeEvent event) {
             Player player = event.getPlayer();
-            double expAddition = SXAttribute.getApi().getEntityData(player).getValues(getName())[0];
+            double expAddition = Sx.getEntityData(player).getValues(getName())[0];
             if (event.getAmount() > 0 && expAddition > 0) {
                 event.setAmount((int) (event.getAmount() * (100 + expAddition) / 100));
-                Message.send(player, Message.getMsg(Message.PLAYER__EXP_ADDITION, event.getAmount(), expAddition));
+                send(player, "Message", event.getAmount(), expAddition);
             }
         }
     }
@@ -92,11 +105,11 @@ public class ExpAddition extends SubAttribute {
                 return;
             }
             Player player = event.getPlayer();
-            Double expAddition = SXAttribute.getApi().getEntityData(player).getValues(getName())[0];
+            Double expAddition = Sx.getEntityData(player).getValues(getName())[0];
             if (event.getAmount() > 0 && expAddition > 0) {
                 int exp = (int) (event.getAmount() * expAddition / 100);
                 event.setAmount(exp + event.getAmount());
-                Message.send(player, Message.getMsg(Message.PLAYER__EXP_ADDITION, event.getAmount(), expAddition));
+                send(player, "Message", event.getAmount(), expAddition);
             }
         }
     }

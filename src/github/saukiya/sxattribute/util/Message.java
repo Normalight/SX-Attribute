@@ -3,6 +3,7 @@ package github.saukiya.sxattribute.util;
 import github.saukiya.sxattribute.SXAttribute;
 import github.saukiya.sxattribute.data.attribute.SubAttribute;
 import lombok.Getter;
+import lombok.Setter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -23,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 public enum Message {
+
     MESSAGE_VERSION,
     PLAYER__NO_REGISTER_SLOTS,
     PLAYER__NO_LEVEL_USE,
@@ -36,10 +38,7 @@ public enum Message {
     PLAYER__BATTLE__FIRST_PERSON,
     PLAYER__BATTLE__CRIT,
     PLAYER__BATTLE__IGNITION,
-    PLAYER__BATTLE__WITHER,
-    PLAYER__BATTLE__POISON,
     PLAYER__BATTLE__POTION,
-    PLAYER__BATTLE__SLOWNESS,
     PLAYER__BATTLE__LIGHTNING,
     PLAYER__BATTLE__REAL,
     PLAYER__BATTLE__TEARING,
@@ -49,10 +48,7 @@ public enum Message {
     PLAYER__BATTLE__LIFE_STEAL,
     PLAYER__HOLOGRAPHIC__CRIT,
     PLAYER__HOLOGRAPHIC__IGNITION,
-    PLAYER__HOLOGRAPHIC__WITHER,
-    PLAYER__HOLOGRAPHIC__POISON,
     PLAYER__HOLOGRAPHIC__POTION,
-    PLAYER__HOLOGRAPHIC__SLOWNESS,
     PLAYER__HOLOGRAPHIC__LIGHTNING,
     PLAYER__HOLOGRAPHIC__REAL,
     PLAYER__HOLOGRAPHIC__TEARING,
@@ -112,20 +108,21 @@ public enum Message {
     COMMAND__GIVE,
     COMMAND__SAVE,
     COMMAND__NBT,
-    COMMAND__DISPLAYSLOT,
     COMMAND__ATTRIBUTELIST,
     COMMAND__CONDITIONLIST,
     COMMAND__RELOAD,
     REPLACE_LIST;
 
 
-    private static final File FILE = new File(SXAttribute.getPluginFile(), "Message.yml");
+    private static File FILE = new File(SXAttribute.getPluginFile(), "Message.yml");
 
     @Getter
-    private static final String messagePrefix = "[" + SXAttribute.getPluginName() + "] ";
+    private static String messagePrefix = "[" + SXAttribute.getPluginName() + "] ";
 
     @Getter
     private static YamlConfiguration messages;
+
+    private static Tool tool = new Tool();
 
     private static void createDefaultMessage() {
         messages.set(MESSAGE_VERSION.toString(), SXAttribute.getPluginVersion());
@@ -159,8 +156,10 @@ public enum Message {
                 "&c点燃几率:&b %sx_Ignition%%",
                 "&9凋零几率:&b %sx_Wither%%",
                 "&d中毒几率:&b %sx_Poison%%",
+                "&d夺食几率:&b %sx_Hunger%%",
                 "&7致盲几率:&b %sx_Blindness%%",
-                "&3减速几率:&b %sx_Slowness%%",
+                "&3减速几率:&b %sx_Slow%%",
+                "&3夺食几率:&b %sx_Hunger1%%",
                 "&e雷霆几率:&b %sx_Lightning%%",
                 "&c撕裂几率:&b %sx_Tearing%%"
         ));
@@ -174,13 +173,13 @@ public enum Message {
                 "&d闪避几率:&b %sx_Dodge%%",
                 "&9韧性:&b %sx_Toughness%%",
                 "&c反射几率:&b %sx_ReflectionRate%%",
-                "&c反射伤害:&b %sx_Reflection%%",
+                "&c反射比例:&b %sx_Reflection%%",
                 "&2格挡几率:&b %sx_BlockRate%%",
-                "&2格挡伤害:&b %sx_Block%%"
+                "&2格挡比例:&b %sx_Block%%"
         ));
         messages.set(INVENTORY__STATS__BASE.toString(), "&9&l&o其他属性");
         messages.set(INVENTORY__STATS__BASE_LORE.toString(), Arrays.asList(
-                "&e经验加成:&b %sx_ExpAddition%%",
+                "&e经验增幅:&b %sx_ExpAddition%%",
                 "&b移速增幅:&b %sx_WalkSpeed%%",
                 "&b攻速增幅:&b %sx_AttackSpeed%%"
         ));
@@ -208,32 +207,9 @@ public enum Message {
 
         messages.set(PLAYER__BATTLE__FIRST_PERSON.toString(), "你");
         messages.set(PLAYER__BATTLE__CRIT.toString(), "[ACTIONBAR]&c{0}&6 对 &c{1}&6 造成了暴击!");
-        messages.set(PLAYER__BATTLE__IGNITION.toString(), "[ACTIONBAR]&c{0}&6 被 &c{1}&6 点燃了!");
-        messages.set(PLAYER__BATTLE__WITHER.toString(), "[ACTIONBAR]&c{0}&6 被 &c{1}&6 凋零了!");
-        messages.set(PLAYER__BATTLE__POISON.toString(), "[ACTIONBAR]&c{0}&6 被 &c{1}&6 中毒了!");
-        messages.set(PLAYER__BATTLE__POTION.toString(), "[ACTIONBAR]&c{0}&6 对 &c{1}&6 造成了§r{2}&6效果!");
-        messages.set(PLAYER__BATTLE__SLOWNESS.toString(), "[ACTIONBAR]&c{0}&6 被 &c{1}&6 减速了!");
-        messages.set(PLAYER__BATTLE__LIGHTNING.toString(), "[ACTIONBAR]&c{0}&6 被 &c{1}&6 用雷电击中了!");
-        messages.set(PLAYER__BATTLE__REAL.toString(), "[ACTIONBAR]&c{0}&6 被 &c{1}&6 破甲了!");
-        messages.set(PLAYER__BATTLE__TEARING.toString(), "[ACTIONBAR]&c{0}&6 被 &c{1}&6 撕裂了!");
         messages.set(PLAYER__BATTLE__REFLECTION.toString(), "[ACTIONBAR]&c{0}&6 被 &c{1}&6 反弹伤害了!");
-        messages.set(PLAYER__BATTLE__BLOCK.toString(), "[ACTIONBAR]&c{0}&6 格挡了 &c{1}&6 的部分伤害!");
-        messages.set(PLAYER__BATTLE__DODGE.toString(), "[ACTIONBAR]&c{0}&6 躲开了 &c{1}&6 的攻击!");
-        messages.set(PLAYER__BATTLE__LIFE_STEAL.toString(), "[ACTIONBAR]&c{0}&6 被 &c{1}&6 偷取生命了!");
 
         messages.set(PLAYER__HOLOGRAPHIC__CRIT.toString(), "&a&o暴击: &b&o+{0}");
-        messages.set(PLAYER__HOLOGRAPHIC__IGNITION.toString(), "&c&o点燃: &b&o{0}s");
-        messages.set(PLAYER__HOLOGRAPHIC__WITHER.toString(), "&7&o凋零: &b&o{0}s");
-        messages.set(PLAYER__HOLOGRAPHIC__POISON.toString(), "&5&o中毒: &b&o{0}s");
-        messages.set(PLAYER__HOLOGRAPHIC__POTION.toString(), "&o{0}: &b&o{1}s");
-        messages.set(PLAYER__HOLOGRAPHIC__SLOWNESS.toString(), "&b&o减速: &b&o{0}s");
-        messages.set(PLAYER__HOLOGRAPHIC__LIGHTNING.toString(), "&e&o雷霆: &b&o{0}");
-        messages.set(PLAYER__HOLOGRAPHIC__REAL.toString(), "&c&o破甲");
-        messages.set(PLAYER__HOLOGRAPHIC__TEARING.toString(), "&c&o撕裂: &b{0}");
-        messages.set(PLAYER__HOLOGRAPHIC__REFLECTION.toString(), "&6&o反伤: &b&o{0}");
-        messages.set(PLAYER__HOLOGRAPHIC__BLOCK.toString(), "&2&o格挡: &b&o{0}");
-        messages.set(PLAYER__HOLOGRAPHIC__DODGE.toString(), "&a&o闪避");
-        messages.set(PLAYER__HOLOGRAPHIC__LIFE_STEAL.toString(), "&c&o吸取: &b&o{0}");
         messages.set(PLAYER__HOLOGRAPHIC__DAMAGE.toString(), "&c&o伤害: &b&o{0}");
         messages.set(PLAYER__HOLOGRAPHIC__TAKE.toString(), "&c&o- {0}");
         messages.set(PLAYER__HOLOGRAPHIC__HEALTH.toString(), "&e&o+ {0}");
@@ -258,7 +234,6 @@ public enum Message {
         messages.set(COMMAND__GIVE.toString(), "给予玩家RPG物品");
         messages.set(COMMAND__SAVE.toString(), "保存当前的物品到配置文件 [Type] - 生成器类型");
         messages.set(COMMAND__NBT.toString(), "查看当前手持物品的NBT数据");
-        messages.set(COMMAND__DISPLAYSLOT.toString(), "显示可装载物品的槽位");
         messages.set(COMMAND__ATTRIBUTELIST.toString(), "查看当前属性列表");
         messages.set(COMMAND__CONDITIONLIST.toString(), "查看当前条件列表");
         messages.set(COMMAND__RELOAD.toString(), "重新加载这个插件的配置");
@@ -269,7 +244,6 @@ public enum Message {
         messages.set(REPLACE_LIST.toString() + ".Mule", "骡骡");
         messages.set(REPLACE_LIST.toString() + ".Skeleton", "骷髅");
         messages.set(REPLACE_LIST.toString() + ".Zombie", "僵尸");
-        messages.set(REPLACE_LIST.toString() + ".Silverfish", "蠢虫");
         messages.set(REPLACE_LIST.toString() + ".Horse", "马马");
         messages.set(REPLACE_LIST.toString() + ".Cow", "牛牛");
         messages.set(REPLACE_LIST.toString() + ".Chicken", "鸡鸡");
@@ -313,6 +287,7 @@ public enum Message {
                 Bukkit.getConsoleSender().sendMessage(messagePrefix + "Find Message.yml");
             }
         }
+        tool.setConfig(messages);
         SubAttribute.setFirstPerson(Message.getMsg(Message.PLAYER__BATTLE__FIRST_PERSON));
     }
 
@@ -341,7 +316,7 @@ public enum Message {
      * @return String
      */
     public static String getMsg(Message loc, Object... args) {
-        return ChatColor.translateAlternateColorCodes('&', MessageFormat.format(messages.getString(loc.toString(), "Null Message: " + loc), args));
+        return tool.getString(loc.toString(), args);
     }
 
     /**
@@ -352,38 +327,7 @@ public enum Message {
      * @return List
      */
     public static List<String> getStringList(Message loc, Object... args) {
-        List<String> list = messages.getStringList(loc.toString());
-        if (list.size() == 0) return Collections.singletonList("Null Message: " + loc);
-        int bound = list.size();
-        for (int i = 0; i < bound; i++) {
-            list.set(i, ChatColor.translateAlternateColorCodes('&', MessageFormat.format(list.get(i), args)));
-        }
-        return list;
-    }
-
-    /**
-     * 转换消息为TextComponent
-     *
-     * @param message    String
-     * @param command    String
-     * @param stringList List
-     * @return TextComponent
-     */
-    public static TextComponent getTextComponent(String message, String command, List<String> stringList) {
-        TextComponent tcMessage = new TextComponent(message);
-        if (stringList != null && stringList.size() > 0) {
-            ComponentBuilder bc = new ComponentBuilder("§7" + stringList.get(0).replace("&", "§"));
-            int bound = stringList.size();
-            for (int i = 1; i < bound; i++) {
-                String s = "\n§7" + stringList.get(i).replace("&", "§");
-                bc.append(s);
-            }
-            tcMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, bc.create()));
-        }
-        if (command != null) {
-            tcMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
-        }
-        return tcMessage;
+        return tool.getStringList(loc.toString(), args);
     }
 
     /**
@@ -394,38 +338,64 @@ public enum Message {
      * @param args   Object...
      */
     public static void send(LivingEntity entity, Message loc, Object... args) {
-        if (entity instanceof Player) {
-            send((Player) entity, Message.getMsg(loc, args));
-        }
-    }
-
-    /**
-     * 发送消息给玩家
-     *
-     * @param player  Player
-     * @param message String
-     */
-    public static void send(Player player, String message) {
-        if (message.contains("Null Message")) return;
-        if (message.contains("[ACTIONBAR]")) {
-            message = message.replace("[ACTIONBAR]", "");
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
-        } else if (message.contains("[TITLE]")) {
-            message = message.replace("[TITLE]", "");
-            if (message.contains(":")) {
-                String title = message.split(":")[0];
-                String subTitle = message.split(":")[1];
-                player.sendTitle(title, subTitle, 5, 20, 5);
-            } else {
-                player.sendTitle(message, null, 5, 20, 5);
-            }
-        } else {
-            player.sendMessage(message);
-        }
+        tool.send(entity, loc.toString(), args);
     }
 
     @Override
     public String toString() {
         return name().replace("__", ".");
+    }
+
+    @Setter
+    public static class Tool {
+
+        YamlConfiguration config;
+
+        public YamlConfiguration config() {
+            return config;
+        }
+
+        public Tool() {
+        }
+
+        public String getString(String loc, Object... args) {
+            return ChatColor.translateAlternateColorCodes('&', MessageFormat.format(config.getString(loc, "Null Message: " + loc), args));
+        }
+
+        public List<String> getStringList(String loc, Object... args) {
+            List<String> list = config.getStringList(loc);
+            if (list.size() == 0) return Collections.singletonList("Null Message: " + loc);
+            for (int i = 0; i < list.size(); i++) {
+                list.set(i, ChatColor.translateAlternateColorCodes('&', MessageFormat.format(list.get(i), args)));
+            }
+            return list;
+        }
+
+        public void send(LivingEntity entity, String loc, Object... args) {
+            send(entity, getString(loc, args));
+        }
+
+        public static void send(LivingEntity entity, String msg) {
+            if (entity instanceof Player) {
+                Player player = (Player) entity;
+                if (msg.contains("[ACTIONBAR]")) {
+                    msg = msg.replace("[ACTIONBAR]", "");
+                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(msg));
+                } else if (msg.contains("[TITLE]")) {
+                    String[] titleSplit = msg.replace("[TITLE]", "").split(":");
+                    player.sendTitle(titleSplit[0], titleSplit.length > 1 ? titleSplit[1] : null, 5, 20, 5);
+                } else {
+                    player.sendMessage(msg);
+                }
+            }
+        }
+
+        public static TextComponent getTextComponent(String msg, String command, String showText) {
+            TextComponent tc = new TextComponent(msg);
+            if (showText != null)
+                tc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("§7" + showText).create()));
+            if (command != null) tc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
+            return tc;
+        }
     }
 }

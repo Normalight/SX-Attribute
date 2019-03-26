@@ -3,7 +3,6 @@ package github.saukiya.sxattribute.command;
 import github.saukiya.sxattribute.SXAttribute;
 import github.saukiya.sxattribute.command.sub.*;
 import github.saukiya.sxattribute.util.Message;
-import me.skymc.taboolib.json.tellraw.TellrawJson;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -35,10 +34,10 @@ public class MainCommand implements CommandExecutor, TabCompleter {
         new GiveCommand().registerCommand(plugin);
         new SaveCommand().registerCommand(plugin);
         new NBTCommand().registerCommand(plugin);
-        new DisplaySlotCommand().registerCommand(plugin);
         new AttributeListCommand().registerCommand(plugin);
         new ConditionListCommand().registerCommand(plugin);
         new ReloadCommand().registerCommand(plugin);
+        new TestCommand().registerCommand(plugin);
     }
 
     public void setUp(String command) {
@@ -71,10 +70,13 @@ public class MainCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command arg1, String label, String[] args) {
         SenderType type = getType(sender);
         if (args.length == 0) {
-            String message = "§0-§8 --§7 ---§c ----§4 -----§b " + SXAttribute.getPluginName() + "§4 -----§c ----§7 ---§8 --§0 - §0Author Saukiya";
-            TellrawJson json = TellrawJson.create().append(message);
-            if (sender.isOp()) json.hoverText("§8§oUse Permission: SX-Attribute.use");
-            json.send(sender);
+            String title = "§0-§8 --§7 ---§c ----§4 -----§b " + SXAttribute.getPluginName() + "§4 -----§c ----§7 ---§8 --§0 - §0Author Saukiya";
+//            if (type.equals(SenderType.PLAYER) && sender.isOp()) {
+//                sender.spigot().sendMessage(Message.Tool.getTextComponent(title, null, "§8§oUse Permission: SX-Attribute.use"));
+//            } else {
+//                sender.sendMessage(title);
+//            }
+            sender.spigot().sendMessage(Message.Tool.getTextComponent(title, null, sender.isOp() ? "§8§oUse Permission: SX-Attribute.use" : null));
             String color = "§7";
             for (SubCommand sub : subCommands.toCollection()) {
                 if (sub.isUse(sender, type) && !sub.hide()) {

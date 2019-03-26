@@ -5,10 +5,9 @@ import github.saukiya.sxattribute.data.attribute.SXAttributeType;
 import github.saukiya.sxattribute.data.attribute.SubAttribute;
 import github.saukiya.sxattribute.data.eventdata.EventData;
 import github.saukiya.sxattribute.data.eventdata.sub.DamageData;
-import github.saukiya.sxattribute.util.Config;
-import github.saukiya.sxattribute.util.Message;
 import org.bukkit.EntityEffect;
 import org.bukkit.Particle;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -30,6 +29,15 @@ public class Tearing extends SubAttribute {
      */
     public Tearing(JavaPlugin plugin) {
         super(plugin, 1, SXAttributeType.ATTACK);
+    }
+
+    @Override
+    protected YamlConfiguration defaultConfig(YamlConfiguration config) {
+        config.set("Message.Holo", "&c&o撕裂: &b{0}");
+        config.set("Message.Battle", "[ACTIONBAR]&c{0}&6 被 &c{1}&6 撕裂了!");
+        config.set("Tearing.DiscernName", "撕裂几率");
+        config.set("Tearing.CombatPower", 1);
+        return config;
     }
 
     @Override
@@ -61,9 +69,9 @@ public class Tearing extends SubAttribute {
                         }
                     }
                 }.runTaskTimer(getPlugin(), 5, size);
-                damageData.sendHolo(Message.getMsg(Message.PLAYER__HOLOGRAPHIC__TEARING, getDf().format(tearingDamage * 12 / size)));
-                Message.send(damageData.getAttacker(), Message.PLAYER__BATTLE__TEARING, damageData.getDefenderName(), getFirstPerson(), getDf().format(tearingDamage * 12 / size));
-                Message.send(damageData.getDefender(), Message.PLAYER__BATTLE__TEARING, getFirstPerson(), damageData.getAttackerName(), getDf().format(tearingDamage * 12 / size));
+                damageData.sendHolo(getString("Message.Holo", getDf().format(tearingDamage * 12 / size)));
+                send(damageData.getAttacker(), "Message.Battle", damageData.getDefenderName(), getFirstPerson(), getDf().format(tearingDamage * 12 / size));
+                send(damageData.getDefender(), "Message.Battle", getFirstPerson(), damageData.getAttackerName(), getDf().format(tearingDamage * 12 / size));
             }
         }
     }
@@ -80,13 +88,19 @@ public class Tearing extends SubAttribute {
 
     @Override
     public void loadAttribute(double[] values, String lore) {
-        if (lore.contains(Config.getConfig().getString(Config.NAME_TEARING))) {
+        if (lore.contains(getString("Tearing.DiscernName"))) {
             values[0] += getNumber(lore);
         }
     }
 
     @Override
+    public void correct(double[] values) {
+        super.correct(values);
+        values[0] = Math.min(values[0], config().getInt("Tearing.UpperLimit", 100));
+    }
+
+    @Override
     public double calculationCombatPower(double[] values) {
-        return values[0] * Config.getConfig().getInt(Config.VALUE_TEARING);
+        return values[0] * config().getInt("Tearing.CombatPower");
     }
 }

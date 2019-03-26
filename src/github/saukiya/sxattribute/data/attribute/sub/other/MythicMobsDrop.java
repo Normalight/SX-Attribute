@@ -1,6 +1,7 @@
 package github.saukiya.sxattribute.data.attribute.sub.other;
 
 import github.saukiya.sxattribute.SXAttribute;
+import github.saukiya.sxattribute.api.Sx;
 import github.saukiya.sxattribute.data.attribute.SXAttributeType;
 import github.saukiya.sxattribute.data.attribute.SubAttribute;
 import github.saukiya.sxattribute.data.eventdata.EventData;
@@ -17,7 +18,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.ArrayList;
 import java.util.List;
 
-//import github.saukiya.sxseal.SXSeal;
 
 /**
  * @author Saukiya
@@ -29,11 +29,8 @@ public class MythicMobsDrop extends SubAttribute implements Listener {
     }
 
     @Override
-    public void onEnable() {
-        if (Bukkit.getPluginManager().getPlugin("MythicMobs") != null) {
-//            sxSeal = Bukkit.getPluginManager().getPlugin("SX-Seal") != null;
-            Bukkit.getPluginManager().registerEvents(this, getPlugin());
-        }
+    public Listener getListener() {
+        return SXAttribute.isMythicMobs() ? this : null;
     }
 
     @EventHandler
@@ -62,7 +59,7 @@ public class MythicMobsDrop extends SubAttribute implements Listener {
                             amount = Integer.valueOf(args[1].replaceAll("[^0-9]", ""));
                         }
                     }
-                    ItemStack item = SXAttribute.getApi().getItem(args[0], (Player) event.getKiller());
+                    ItemStack item = Sx.getItem(args[0], (Player) event.getKiller());
                     if (item != null) {
 //                        if (str.contains("seal") && sxSeal) {
 //                            SXSeal.getApi().sealItem(itemdata);

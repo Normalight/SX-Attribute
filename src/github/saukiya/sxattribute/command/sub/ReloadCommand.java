@@ -30,7 +30,7 @@ public class ReloadCommand extends SubCommand {
 
     @Override
     public void onCommand(SXAttribute plugin, CommandSender sender, String[] args) {
-        Long oldTimes = System.currentTimeMillis();
+        long oldTimes = System.currentTimeMillis();
         try {
             Config.loadConfig();
             Message.loadMessage();
@@ -44,7 +44,7 @@ public class ReloadCommand extends SubCommand {
         TimeUtil.getSdf().reload();
         plugin.getAttributeManager().onAttributeReload();
         plugin.getAttributeManager().loadDefaultAttributeData();
-        plugin.getRegisterSlotManager().loadData();
+        plugin.getSlotDataManager().loadData();
         int size = 0;
         d1:
         for (UUID uuid : new ArrayList<>(plugin.getAttributeManager().getEntityDataMap().keySet())) {

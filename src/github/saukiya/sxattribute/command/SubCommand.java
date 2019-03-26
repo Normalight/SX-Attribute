@@ -3,7 +3,7 @@ package github.saukiya.sxattribute.command;
 import github.saukiya.sxattribute.SXAttribute;
 import github.saukiya.sxattribute.util.Message;
 import lombok.Getter;
-import me.skymc.taboolib.json.tellraw.TellrawJson;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -34,24 +34,22 @@ public abstract class SubCommand {
     /**
      * @param cmd         String
      * @param arg         String
-     * @param hide        Boolean
-     * @param senderTypes SenderType[]
-     */
-    public SubCommand(String cmd, String arg, Boolean hide, SenderType... senderTypes) {
-        this.cmd = cmd;
-        this.arg = arg;
-        this.hide = hide;
-        this.senderTypes = senderTypes;
-    }
-
-    /**
-     * @param cmd         String
-     * @param arg         String
      * @param senderTypes SenderType[]
      */
     public SubCommand(String cmd, String arg, SenderType... senderTypes) {
         this.cmd = cmd;
         this.arg = arg;
+        this.senderTypes = senderTypes;
+    }
+
+    /**
+     * @param cmd         String
+     * @param hide        Boolean
+     * @param senderTypes SenderType[]
+     */
+    public SubCommand(String cmd, Boolean hide, SenderType... senderTypes) {
+        this.cmd = cmd;
+        this.hide = hide;
         this.senderTypes = senderTypes;
     }
 
@@ -81,7 +79,7 @@ public abstract class SubCommand {
             Bukkit.getConsoleSender().sendMessage(Message.getMessagePrefix() + "§cCommand >> §4" + this.cmd() + " §cNull Plugin!");
             return;
         }
-        if (SXAttribute.isPluginEnabled()) {
+        if (Bukkit.getPluginManager().getPlugin("SX-Attribute").isEnabled()) {
             Bukkit.getConsoleSender().sendMessage("[" + plugin.getName() + "] §cCommand >> §cSXAttribute is Enabled §4" + this.cmd() + "§r !");
             return;
         }
@@ -161,9 +159,8 @@ public abstract class SubCommand {
      */
     public void sendIntroduction(CommandSender sender, String color, String label) {
         String clickCommand = MessageFormat.format("/{0} {1}", label, cmd());
-        TellrawJson json = TellrawJson.create().append("§c" + Message.getMsg(Message.valueOf("COMMAND__" + cmd().toUpperCase()))).clickCommand(clickCommand);
-        if (sender.isOp()) json.hoverText("§8§oPermission: " + permission());
-        TellrawJson.create().append(color + MessageFormat.format("/{0} {1}{2}§7 - ", label, cmd(), arg())).clickCommand(clickCommand).append(json).send(sender);
+        TextComponent tc = Message.Tool.getTextComponent(color + MessageFormat.format("/{0} {1}{2}§7 - §c" + Message.getMsg(Message.valueOf("COMMAND__" + cmd().toUpperCase())), label, cmd(), arg()), clickCommand, sender.isOp() ? "§8§oPermission: " + permission() : null);
+        sender.spigot().sendMessage(tc);
     }
 
     protected Player getPlayer(CommandSender sender, Player player) {

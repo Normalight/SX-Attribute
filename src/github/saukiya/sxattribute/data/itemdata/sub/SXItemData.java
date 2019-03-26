@@ -1,9 +1,11 @@
 package github.saukiya.sxattribute.data.itemdata.sub;
 
 import github.saukiya.sxattribute.SXAttribute;
+import github.saukiya.sxattribute.api.Sx;
 import github.saukiya.sxattribute.data.condition.SubCondition;
 import github.saukiya.sxattribute.data.itemdata.ItemGenerator;
 import github.saukiya.sxattribute.data.itemdata.ItemUpdate;
+import github.saukiya.sxattribute.util.CalculatorUtil;
 import github.saukiya.sxattribute.util.Config;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Color;
@@ -102,7 +104,7 @@ public class SXItemData implements ItemGenerator, ItemUpdate {
 
     @Override
     public String getName() {
-        return SXAttribute.getApi().getRandomStringManager().processRandomString(displayName, new HashMap<>());
+        return Sx.getRandomStringManager().processRandomString(displayName, new HashMap<>());
     }
 
     @Override
@@ -113,11 +115,11 @@ public class SXItemData implements ItemGenerator, ItemUpdate {
     @Override
     public ItemStack getItem(Player player) {
         Map<String, String> lockRandomMap = new HashMap<>();
-        String displayName = SXAttribute.getApi().getRandomStringManager().processRandomString(this.displayName, lockRandomMap);
-        String id = SXAttribute.getApi().getRandomStringManager().processRandomString(ids.get(SXAttribute.getRandom().nextInt(ids.size())), lockRandomMap);
+        String displayName = Sx.getRandomStringManager().processRandomString(this.displayName, lockRandomMap);
+        String id = Sx.getRandomStringManager().processRandomString(ids.get(SXAttribute.getRandom().nextInt(ids.size())), lockRandomMap);
         List<String> loreList = new ArrayList<>();
         for (String lore : this.loreList) {
-            lore = SXAttribute.getApi().getRandomStringManager().processRandomString(lore, lockRandomMap);
+            lore = Sx.getRandomStringManager().processRandomString(lore, lockRandomMap);
             if (!lore.contains("%DeleteLore%")) {
                 loreList.addAll(Arrays.asList(lore.replace("\n", "/n").split("/n")));
             }
@@ -126,10 +128,23 @@ public class SXItemData implements ItemGenerator, ItemUpdate {
             displayName = PlaceholderAPI.setPlaceholders(player, displayName);
             loreList = PlaceholderAPI.setPlaceholders(player, loreList);
         }
+        // 计算器<c:>
+        try {
+            for (int i = 0; i < loreList.size(); i++) {
+                String lore = loreList.get(i);
+                List<String> replaceExprList = Sx.getRandomStringManager().getStringList("<c:", ">", lore);
+                for (String expr : replaceExprList) {
+                    lore = lore.replaceFirst("<c:" + expr.replace("*","\\*").replace("(", "\\(").replace(")", "\\)").replace("+", "\\+") + ">", SXAttribute.getDf().format(CalculatorUtil.getResult(expr)));
+                }
+                loreList.set(i, lore);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         List<String> enchantList = new ArrayList<>();
         for (String enchant : this.enchantList) {
-            enchant = SXAttribute.getApi().getRandomStringManager().processRandomString(enchant, lockRandomMap);
+            enchant = Sx.getRandomStringManager().processRandomString(enchant, lockRandomMap);
             if (!enchant.contains("%DeleteLore%")) {
                 enchantList.addAll(Arrays.asList(enchant.replace("\n", "/n").split("/n")));
             }
@@ -141,13 +156,11 @@ public class SXItemData implements ItemGenerator, ItemUpdate {
             for (Map.Entry<String, String> entry : lockRandomMap.entrySet()) {
                 list.add(entry.getKey() + "§e§k|§e§r" + entry.getValue());
             }
-            SXAttribute.getApi().getNbtUtil().setNBTList(item, SXAttribute.getPluginName() + "-Lock", list);
+            Sx.getNbtUtil().setNBTList(item, SXAttribute.getPluginName() + "-Lock", list);
         }
         if (item.getItemMeta().hasLore()) {
-            if (Config.isDamageGauges() && SXAttribute.getApi().getNbtUtil().getAttackSpeed(item) != null) {
-                SXAttribute.getApi().getNbtUtil().setAttackSpeed(item);
-            } else if (Config.isClearDefaultAttributePlugin() && SXAttribute.getApi().getNbtUtil().isEquipment(item)) {
-                SXAttribute.getApi().getNbtUtil().clearAttribute(item);
+            if (Config.isClearDefaultAttributePlugin() && Sx.getNbtUtil().isEquipment(item) && config.getBoolean("ClearAttribute", true)) {
+                Sx.getNbtUtil().clearAttribute(item);
             }
         }
         return item;
@@ -156,27 +169,26 @@ public class SXItemData implements ItemGenerator, ItemUpdate {
     @Override
     public ConfigurationSection saveItem(ItemStack saveItem, ConfigurationSection config) {
         ItemMeta itemMeta = saveItem.getItemMeta();
-        config.set(key + ".Name", itemMeta.hasDisplayName() ? itemMeta.getDisplayName().replace("§", "&") : null);
-        config.set(key + ".ID", saveItem.getType().getMaxDurability() != 0 && saveItem.getDurability() != 0 ? saveItem.getTypeId() + ":" + saveItem.getDurability() : String.valueOf(saveItem.getTypeId()));
+        config.set("Name", itemMeta.hasDisplayName() ? itemMeta.getDisplayName().replace("§", "&") : null);
+        config.set("ID", saveItem.getType().getMaxDurability() != 0 && saveItem.getDurability() != 0 ? saveItem.getTypeId() + ":" + saveItem.getDurability() : String.valueOf(saveItem.getTypeId()));
         if (itemMeta.hasLore()) {
-            config.set(key + ".Lore", itemMeta.getLore().stream().map(s -> s.replace("§", "&")).collect(Collectors.toList()));
+            config.set("Lore", itemMeta.getLore().stream().map(s -> s.replace("§", "&")).collect(Collectors.toList()));
         }
         if (itemMeta.hasEnchants()) {
-            config.set(key + ".EnchantList", itemMeta.getEnchants().entrySet().stream().map(entry -> entry.getKey().getName() + ":" + entry.getValue()).collect(Collectors.toList()));
+            config.set("EnchantList", itemMeta.getEnchants().entrySet().stream().map(entry -> entry.getKey().getName() + ":" + entry.getValue()).collect(Collectors.toList()));
         }
         if (itemMeta.getItemFlags().size() > 0) {
-            config.set(key + ".ItemFlagList", itemMeta.getItemFlags().stream().map(Enum::name).collect(Collectors.toList()));
+            config.set("ItemFlagList", itemMeta.getItemFlags().stream().map(Enum::name).collect(Collectors.toList()));
         }
-        config.set(key + ".Unbreakable", SubCondition.getUnbreakable(itemMeta));
+        config.set("Unbreakable", SubCondition.getUnbreakable(itemMeta));
         if (itemMeta instanceof LeatherArmorMeta) {
-            config.set(key + ".Color", ((LeatherArmorMeta) itemMeta).getColor());
+            config.set("Color", ((LeatherArmorMeta) itemMeta).getColor());
         }
         if (itemMeta instanceof SkullMeta) {
-            config.set(key + ".SkullName", ((SkullMeta) itemMeta).getOwner());
+            config.set("SkullName", ((SkullMeta) itemMeta).getOwner());
         }
         return config;
     }
-
 
 
     /**

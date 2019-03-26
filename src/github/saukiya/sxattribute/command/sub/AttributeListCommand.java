@@ -14,7 +14,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -39,28 +38,26 @@ public class AttributeListCommand extends SubCommand {
             SubAttribute attribute = SXAttributeManager.getSubAttributes()[i];
             String message = "§b" + attribute.getPriority() + " §7- §c" + attribute.getName() + " §8[§7Plugin: §c" + attribute.getPlugin().getName() + "§7,Length: §c" + attribute.getLength() + "§8]";
             if (message.contains(search)) {
-                List<String> list = new ArrayList<>();
-                list.add("&bName: " + attribute.getName());
-                list.add("&bAttributeType: ");
-                for (SXAttributeType type : attribute.getType()) {
-                    list.add("&7- " + type.getType() + " &8(&7" + type.getName() + "&8)");
-                }
-                list.add("&bPlaceholders: ");
-                if (attribute.getPlaceholders() != null) {
-                    for (String placeName : attribute.getPlaceholders()) {
-                        list.add("&7- %sx_" + placeName + "% : " + attribute.getPlaceholder(attributeData.getValues(attribute), (Player) sender, placeName));
-                    }
-                }
-                list.add("&bValue: " + attribute.calculationCombatPower(attributeData.getValues(attribute)));
-                TextComponent tc = Message.getTextComponent(message, null, list);
-                if (attribute.getYaml() != null) {
-                    tc.addExtra(" ");
-                    tc.addExtra(Message.getTextComponent("§8[§cYaml§8]", null, Collections.singletonList(attribute.getYaml().saveToString())));
-                }
                 if (sender instanceof Player) {
+                    StringBuilder str = new StringBuilder().append("§bName: ").append(attribute.getName()).append("\n§bAttributeType: ");
+                    for (SXAttributeType type : attribute.getType()) {
+                        str.append("\n§7- ").append(type.getType()).append(" §8(§7").append(type.getName()).append("§8)");
+                    }
+                    str.append("\n§bPlaceholders: ");
+                    if (attribute.getPlaceholders() != null) {
+                        for (String placeName : attribute.getPlaceholders()) {
+                            str.append("\n§7- %sx_").append(placeName).append("% : ").append(attribute.getPlaceholder(attributeData.getValues(attribute), (Player) sender, placeName));
+                        }
+                    }
+                    str.append("\n§bValue: ").append(attribute.calculationCombatPower(attributeData.getValues(attribute)));
+                    TextComponent tc = Message.Tool.getTextComponent(message, null, str.toString());
+                    if (attribute.config() != null) {
+                        tc.addExtra(Message.Tool.getTextComponent("§r §7- §r", null, ""));
+                        tc.addExtra(Message.Tool.getTextComponent("§8[§cConfig§8]", null, attribute.config().saveToString()));
+                    }
                     ((Player) sender).spigot().sendMessage(tc);
                 } else {
-                    sender.sendMessage(tc.getText());
+                    sender.sendMessage(message);
                 }
             } else {
                 filterSize++;
@@ -74,12 +71,12 @@ public class AttributeListCommand extends SubCommand {
     @Override
     public List<String> onTabComplete(SXAttribute plugin, CommandSender sender, String[] args) {
         if (args.length == 2) {
-            List<String> list = new ArrayList<>();
+            List<String> tabList = new ArrayList<>();
             for (SubAttribute subAttribute : SXAttributeManager.getSubAttributes()) {
                 String name = subAttribute.getName();
-                list.add(name);
+                tabList.add(name);
             }
-            return list;
+            return tabList;
         }
         return null;
     }

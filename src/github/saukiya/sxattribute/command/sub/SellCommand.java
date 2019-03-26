@@ -139,7 +139,7 @@ public class SellCommand extends SubCommand implements Listener {
                         enterMeta.setLore(new ArrayList<>());
                         enterMeta.removeEnchant(Enchantment.DURABILITY);
                         MoneyUtil.give(player, sell);
-                        Message.send(player, Message.getMsg(Message.PLAYER__SELL, size, sell));
+                        Message.send(player, Message.PLAYER__SELL, size, sell);
                     }
                     enterItem.setItemMeta(enterMeta);
                     return;

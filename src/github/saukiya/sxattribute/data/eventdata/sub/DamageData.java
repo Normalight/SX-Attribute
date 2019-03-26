@@ -52,7 +52,6 @@ public class DamageData implements EventData {
     private boolean crit;
 
     @Getter
-    @Setter
     private boolean cancelled = false;
 
     public DamageData(LivingEntity defender, LivingEntity attacker, String defenderName, String attackerName, SXAttributeData defenderData, SXAttributeData attackerData, EntityDamageByEntityEvent event) {
@@ -105,5 +104,10 @@ public class DamageData implements EventData {
     public void takeDamage(double takeDamage) {
         damage -= takeDamage;
         event.setDamage(getDamage());
+    }
+
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+        event.setCancelled(cancelled);
     }
 }

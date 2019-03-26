@@ -1,6 +1,5 @@
 package github.saukiya.sxattribute.data;
 
-import github.saukiya.sxattribute.SXAttribute;
 import github.saukiya.sxattribute.util.Config;
 import github.saukiya.sxattribute.util.Message;
 import lombok.Getter;
@@ -12,21 +11,17 @@ import java.util.List;
 /**
  * @author Saukiya
  */
-public class RegisterSlotManager {
+public class SlotDataManager {
 
     @Getter
-    private final List<RegisterSlot> registerSlotList = new ArrayList<>();
+    private final List<SlotData> slotList = new ArrayList<>();
 
-    @Getter
-    private final SXAttribute plugin;
-
-    public RegisterSlotManager(SXAttribute plugin) {
-        this.plugin = plugin;
+    public SlotDataManager() {
         loadData();
     }
 
     public void loadData() {
-        registerSlotList.clear();
+        slotList.clear();
         List<String> registerSlotList = Config.getConfig().getStringList(Config.REGISTER_SLOTS_LIST);
         if (Config.isRegisterSlot() && registerSlotList.size() > 0) {
             for (String str : registerSlotList) {
@@ -34,13 +29,12 @@ public class RegisterSlotManager {
                     String[] args = str.split("#");
                     String name = args[1];
                     int slot = Integer.valueOf(args[0].replaceAll("[^0-9]", ""));
-                    String id = args.length > 2 ? args[2] : null;
-                    this.registerSlotList.add(new RegisterSlot(slot, name, id, plugin.getNbtUtil()));
+                    this.slotList.add(new SlotData(slot, name));
                 }
             }
-            Bukkit.getConsoleSender().sendMessage(Message.getMessagePrefix() + "Load §c" + this.registerSlotList.size() + " §rRegisterSlot");
+            Bukkit.getConsoleSender().sendMessage(Message.getMessagePrefix() + "Load §c" + this.slotList.size() + " §rRegisterSlot");
         } else {
-            Bukkit.getConsoleSender().sendMessage(Message.getMessagePrefix() + "§cDisable RegisterSlot");
+            Bukkit.getConsoleSender().sendMessage(Message.getMessagePrefix() + "§cDisable SlotData");
         }
     }
 }

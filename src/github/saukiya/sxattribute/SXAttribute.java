@@ -1,21 +1,22 @@
 package github.saukiya.sxattribute;
 
-import github.saukiya.sxattribute.api.API;
+import github.saukiya.sxattribute.api.Sx;
 import github.saukiya.sxattribute.bstats.Metrics;
 import github.saukiya.sxattribute.command.MainCommand;
-import github.saukiya.sxattribute.data.itemdata.ItemDataManager;
 import github.saukiya.sxattribute.data.RandomStringManager;
-import github.saukiya.sxattribute.data.RegisterSlotManager;
+import github.saukiya.sxattribute.data.SlotDataManager;
 import github.saukiya.sxattribute.data.attribute.SXAttributeManager;
 import github.saukiya.sxattribute.data.attribute.sub.attack.*;
-import github.saukiya.sxattribute.data.attribute.sub.damage.EventMessage;
+import github.saukiya.sxattribute.data.attribute.sub.other.EventMessage;
 import github.saukiya.sxattribute.data.attribute.sub.defence.*;
 import github.saukiya.sxattribute.data.attribute.sub.other.ExpAddition;
 import github.saukiya.sxattribute.data.attribute.sub.other.MythicMobsDrop;
 import github.saukiya.sxattribute.data.attribute.sub.update.AttackSpeed;
+import github.saukiya.sxattribute.data.attribute.sub.update.Command;
 import github.saukiya.sxattribute.data.attribute.sub.update.WalkSpeed;
 import github.saukiya.sxattribute.data.condition.SXConditionManager;
 import github.saukiya.sxattribute.data.condition.sub.*;
+import github.saukiya.sxattribute.data.itemdata.ItemDataManager;
 import github.saukiya.sxattribute.data.itemdata.sub.ImportItemData;
 import github.saukiya.sxattribute.data.itemdata.sub.SXItemData;
 import github.saukiya.sxattribute.listener.*;
@@ -41,76 +42,60 @@ import java.util.stream.IntStream;
  */
 
 
+@Getter
 public class SXAttribute extends JavaPlugin {
 
     @Getter
-    private static final int[] versionSplit = new int[3];
-    @Getter
-    private static final Random random = new Random();
+    private static int[] versionSplit = new int[3];
 
     @Getter
-    private static API api;
+    private static Random random = new Random();
+
     @Getter
     private static String pluginName;
     @Getter
     private static String pluginVersion;
     @Getter
     private static File pluginFile;
+
     @Getter
     @Setter
     private static DecimalFormat df = new DecimalFormat("#.##");
-
     @Getter
-    private static boolean pluginEnabled = false;
-
+    private static boolean tabooLib = false;
     @Getter
     private static boolean placeholder = false;
-
     @Getter
     private static boolean holographic = false;
-
     @Getter
     private static boolean vault = false;
-
     @Getter
     private static boolean rpgInventory = false;
-
     @Getter
     private static boolean sxLevel = false;
-
     @Getter
     private static boolean mythicMobs = false;
 
 
-    @Getter
     private NbtUtil nbtUtil;
 
-    @Getter
     private MainCommand mainCommand;
 
-    @Getter
     private SXAttributeManager attributeManager;
 
-    @Getter
     private SXConditionManager conditionManager;
 
-    @Getter
     private RandomStringManager randomStringManager;
 
-    @Getter
     private ItemDataManager itemDataManager;
 
-    @Getter
-    private RegisterSlotManager registerSlotManager;
+    private SlotDataManager slotDataManager;
 
-    @Getter
     private OnUpdateStatsListener onUpdateStatsListener;
 
-    @Getter
     private OnDamageListener onDamageListener;
 
-    @Getter
-    private OnHealthChangeDisplayListener onHealthChangeDisplayListener;
+    private OnHealthChangeListener onHealthChangeListener;
 
     @Override
     public void onLoad() {
@@ -118,7 +103,11 @@ public class SXAttribute extends JavaPlugin {
         pluginFile = getDataFolder();
         pluginName = getName();
         pluginVersion = this.getDescription().getVersion();
-        api = new API(this);
+        String version = Bukkit.getBukkitVersion().split("-")[0].replace(" ", "");
+        String[] strSplit = version.split("[.]");
+        IntStream.range(0, strSplit.length).forEach(i -> versionSplit[i] = Integer.valueOf(strSplit[i]));
+        Bukkit.getConsoleSender().sendMessage(Message.getMessagePrefix() + "ServerVersion: " + version);
+        new Sx(this);
         try {
             Config.loadConfig();
             Message.loadMessage();
@@ -128,20 +117,15 @@ public class SXAttribute extends JavaPlugin {
         }
         mainCommand = new MainCommand(this);
 
-
-
         new Crit(this);
         new Damage(this);
         new HitRate(this);
         new Ignition(this);
         new LifeSteal(this);
         new Lightning(this);
-//        new Poison(this);
-        new Potion(this);
+        new AttackPotion(this);
         new Real(this);
-//        new Slowness(this);
         new Tearing(this);
-//        new Wither(this);
 
         new Block(this);
         new Defense(this);
@@ -157,6 +141,7 @@ public class SXAttribute extends JavaPlugin {
         new Health(this);
         new WalkSpeed(this);
         new AttackSpeed(this);
+        new Command(this);
 
         new MainHand(this);
         new OffHand(this);
@@ -173,6 +158,13 @@ public class SXAttribute extends JavaPlugin {
     @Override
     public void onEnable() {
         long oldTimes = System.currentTimeMillis();
+        if (Bukkit.getPluginManager().isPluginEnabled("TabooLib")) {
+            tabooLib = true;
+            Bukkit.getConsoleSender().sendMessage(Message.getMessagePrefix() + "Find TabooLib");
+        } else {
+            Bukkit.getConsoleSender().sendMessage(Message.getMessagePrefix() + "§cNo Find TabooLib!");
+        }
+
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             placeholder = true;
             new Placeholders(this);
@@ -222,14 +214,6 @@ public class SXAttribute extends JavaPlugin {
             Bukkit.getConsoleSender().sendMessage(Message.getMessagePrefix() + "§cNo Find SX-Level!");
         }
 
-        String version = Bukkit.getBukkitVersion().split("-")[0].replace(" ", "");
-        Bukkit.getConsoleSender().sendMessage(Message.getMessagePrefix() + "ServerVersion: " + version);
-        String[] strSplit = version.split("[.]");
-        IntStream.range(0, strSplit.length).forEach(i -> versionSplit[i] = Integer.valueOf(strSplit[i]));
-        pluginEnabled = true;
-        attributeManager = new SXAttributeManager(this);
-
-        conditionManager = new SXConditionManager();
         new Metrics(this);
         try {
             nbtUtil = new NbtUtil();
@@ -247,15 +231,16 @@ public class SXAttribute extends JavaPlugin {
             return;
         }
 
-
-        registerSlotManager = new RegisterSlotManager(this);
+        attributeManager = new SXAttributeManager(this);
+        conditionManager = new SXConditionManager();
+        slotDataManager = new SlotDataManager();
         onUpdateStatsListener = new OnUpdateStatsListener(this);
         onDamageListener = new OnDamageListener(this);
-        onHealthChangeDisplayListener = new OnHealthChangeDisplayListener(this);
+        onHealthChangeListener = new OnHealthChangeListener(this);
         Bukkit.getPluginManager().registerEvents(new OnBanShieldInteractListener(), this);
         Bukkit.getPluginManager().registerEvents(onUpdateStatsListener, this);
         Bukkit.getPluginManager().registerEvents(onDamageListener, this);
-        Bukkit.getPluginManager().registerEvents(onHealthChangeDisplayListener, this);
+        Bukkit.getPluginManager().registerEvents(onHealthChangeListener, this);
         Bukkit.getPluginManager().registerEvents(new OnItemSpawnListener(), this);
         mainCommand.setUp("sxAttribute");
         mainCommand.onCommandEnable();
@@ -279,6 +264,6 @@ public class SXAttribute extends JavaPlugin {
         attributeManager.onAttributeDisable();
         conditionManager.onConditionDisable();
         mainCommand.onCommandDisable();
-        onHealthChangeDisplayListener.onDisable();
+        onHealthChangeListener.cancel();
     }
 }

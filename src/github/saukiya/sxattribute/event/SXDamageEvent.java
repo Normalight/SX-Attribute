@@ -1,31 +1,24 @@
 package github.saukiya.sxattribute.event;
 
-import github.saukiya.sxattribute.data.attribute.SXAttributeData;
+import github.saukiya.sxattribute.data.eventdata.sub.DamageData;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 /**
- * 获取实体数据事件
+ * 插件重载事件
  *
  * @author Saukiya
  */
-
-public class SXGetDataEvent extends Event {
+@Getter
+public class SXDamageEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
 
-    @Getter
-    private final LivingEntity entity;
+    private DamageData data;
 
-    @Getter
-    @Setter
-    private SXAttributeData data;
-
-    public SXGetDataEvent(LivingEntity entity, SXAttributeData data) {
-        this.entity = entity;
+    public SXDamageEvent(DamageData data) {
         this.data = data;
     }
 

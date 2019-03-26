@@ -35,13 +35,11 @@ public class ConditionListCommand extends SubCommand {
             String message = "§b" + condition.getPriority() + " §7- §c" + condition.getName() + " §8[§7Plugin: §c" + condition.getPlugin().getName() + "§8]";
             if (message.contains(search)) {
                 if (sender instanceof Player) {
-                    List<String> list = new ArrayList<>();
-                    list.add("&bName: " + condition.getName());
-                    list.add("&bConditionType: ");
+                    StringBuilder str = new StringBuilder().append("\n&bName: ").append(condition.getName()).append("\n&bConditionType: ");
                     for (SXConditionType type : condition.getType()) {
-                        list.add("&7- " + type.getType() + " &8(&7" + type.getName() + "&8)");
+                        str.append("\n&7- ").append(type.getType()).append(" &8(&7").append(type.getName()).append("&8)");
                     }
-                    TextComponent tc = Message.getTextComponent(message, null, list);
+                    TextComponent tc = Message.Tool.getTextComponent(message, null, str.toString());
                     ((Player) sender).spigot().sendMessage(tc);
                 } else {
                     sender.sendMessage(message);
@@ -58,12 +56,12 @@ public class ConditionListCommand extends SubCommand {
     @Override
     public List<String> onTabComplete(SXAttribute plugin, CommandSender sender, String[] args) {
         if (args.length == 2) {
-            List<String> list = new ArrayList<>();
+            List<String> tabList = new ArrayList<>();
             for (SubCondition condition : SXConditionManager.getSubConditions()) {
                 String name = condition.getName();
-                list.add(name);
+                tabList.add(name);
             }
-            return list;
+            return tabList;
         }
         return null;
     }

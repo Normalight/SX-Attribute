@@ -5,8 +5,8 @@ import github.saukiya.sxattribute.data.attribute.SXAttributeType;
 import github.saukiya.sxattribute.data.attribute.SubAttribute;
 import github.saukiya.sxattribute.data.eventdata.EventData;
 import github.saukiya.sxattribute.data.eventdata.sub.DamageData;
-import github.saukiya.sxattribute.util.Config;
 import lombok.Getter;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -37,6 +37,17 @@ public class Defense extends SubAttribute {
      */
     public Defense(JavaPlugin plugin) {
         super(plugin, 6, SXAttributeType.DEFENCE);
+    }
+
+    @Override
+    protected YamlConfiguration defaultConfig(YamlConfiguration config) {
+        config.set("Defense.DiscernName", "防御力");
+        config.set("Defense.CombatPower", 1);
+        config.set("PVPDefense.DiscernName", "PVP防御力");
+        config.set("PVPDefense.CombatPower", 1);
+        config.set("PVEDefense.DiscernName", "PVE防御力");
+        config.set("PVEDefense.CombatPower", 1);
+        return config;
     }
 
     @Override
@@ -98,15 +109,15 @@ public class Defense extends SubAttribute {
     @Override
     public void loadAttribute(double[] values, String lore) {
         String[] loreSplit = lore.split("-");
-        if (lore.contains(Config.getConfig().getString(Config.NAME_PVE_DEFENSE))) {
+        if (lore.contains(getString("PVEDefense.DiscernName"))) {
             values[4] += getNumber(loreSplit[0]);
             values[5] += getNumber(loreSplit[loreSplit.length > 1 ? 1 : 0]);
 
-        } else if (lore.contains(Config.getConfig().getString(Config.NAME_PVP_DEFENSE))) {
+        } else if (lore.contains(getString("PVPDefense.DiscernName"))) {
             values[2] += getNumber(loreSplit[0]);
             values[3] += getNumber(loreSplit[loreSplit.length > 1 ? 1 : 0]);
 
-        } else if (lore.contains(Config.getConfig().getString(Config.NAME_DEFENSE))) {
+        } else if (lore.contains(getString("Defense.DiscernName"))) {
             values[0] += getNumber(loreSplit[0]);
             values[1] += getNumber(loreSplit[loreSplit.length > 1 ? 1 : 0]);
         }
@@ -124,9 +135,9 @@ public class Defense extends SubAttribute {
 
     @Override
     public double calculationCombatPower(double[] values) {
-        double value = (values[0] + values[1]) / 2 * Config.getConfig().getInt(Config.VALUE_DEFENSE);
-        value += (values[2] + values[3]) / 2 * Config.getConfig().getInt(Config.VALUE_PVP_DEFENSE);
-        value += (values[4] + values[5]) / 2 * Config.getConfig().getInt(Config.VALUE_PVE_DEFENSE);
+        double value = (values[0] + values[1]) / 2 * config().getInt("Defense.CombatPower");
+        value += (values[2] + values[3]) / 2 * config().getInt("PVPDefense.CombatPower");
+        value += (values[4] + values[5]) / 2 * config().getInt("PVEDefense.CombatPower");
         return value;
     }
 }
